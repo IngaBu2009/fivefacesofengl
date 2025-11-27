@@ -57,7 +57,7 @@ REGIONS = {
     "australia": {
         "title": "Australia",
         "sections": [
-            {"title": "Culture", "content": "Короткое описание культуры Австралии..."},
+            {"title": "Culture", "content": "что-то про австралию"},
             {"title": "History", "content": "Короткое описание истории..."},
             {"title": "Attractions", "content": "Достопримечательности..."},
             {"title": "Language", "content": "Особенности английского языка в Австралии..."},
