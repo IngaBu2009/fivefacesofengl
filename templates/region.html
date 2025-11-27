@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+  <article>
+    <h2>{{ region.title }}</h2>
+    {% for sec in region.sections %}
+      <section class="region-section">
+        <h3>{{ sec.title }}</h3>
+        <p>{{ sec.content }}</p>
+      </section>
+    {% endfor %}
+  </article>
+{% endblock %}
