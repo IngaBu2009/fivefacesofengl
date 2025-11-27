@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ title if title else "English forever" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1><a href="{{ url_for('index') }}">English forever</a></h1>
+      <nav>
+        <ul class="main-nav">
+          {% for item in nav %}
+            <li><a href="{{ url_for('page', slug=item.slug) }}">{{ item.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Проект «Sweets, lollies and candies» — перенос с Google Sites.</p>
+    </div>
+  </footer>
+</body>
+</html>
