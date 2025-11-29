@@ -1,12 +1,41 @@
 {% extends "base.html" %}
+
 {% block content %}
-  <article>
-    <h2>{{ region.title }}</h2>
+<div class="region-page">
+
+    <h2 class="region-title">{{ region.title }}</h2>
+
     {% for sec in region.sections %}
-      <section class="region-section">
+    <section class="region-section">
+
         <h3>{{ sec.title }}</h3>
-        <p>{{ sec.content }}</p>
-      </section>
+
+        {% if sec.content %}
+            <p>{{ sec.content }}</p>
+        {% endif %}
+
+        {% if sec.table %}
+        <table class="word-table">
+            {% for row in sec.table %}
+                {% if loop.first %}
+                    <tr>
+                        {% for col in row %}
+                            <th>{{ col }}</th>
+                        {% endfor %}
+                    </tr>
+                {% else %}
+                    <tr>
+                        {% for col in row %}
+                            <td>{{ col }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+        {% endif %}
+
+    </section>
     {% endfor %}
-  </article>
+
+</div>
 {% endblock %}
