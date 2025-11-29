@@ -113,7 +113,32 @@ def page(slug):
     if slug == "home":
         return index()
     if slug == "diversity":
-        return render_template("region.html", nav=NAV, region={"title": "Diversity of words", "sections":[{"title":"Intro","content":"Материал о разнообразии слов..."}]})
+        return render_template(
+            "region.html",
+            nav=NAV,
+            region={
+                "title": "Diversity of words",
+                "sections": [
+                    {
+                        "title": "Introduction",
+                        "content": "Here is a comparison table showing how different English-speaking countries use different words for the same things.",
+                    },
+                    {
+                        "title": "Vocabulary Comparison Table",
+                        "table": [
+                            ["Object", "USA", "UK", "Australia", "New Zealand"],
+                            ["Candy / Sweet", "Candy", "Sweets", "Lollies", "Lollies"],
+                            ["Flip-flops", "Flip-flops", "Flip-flops", "Thongs", "Jandals"],
+                            ["Sweater", "Sweater", "Jumper", "Jumper", "Jumper"],
+                            ["Garbage bin", "Trash can", "Bin", "Bin", "Rubbish bin"],
+                            ["Sausage", "Sausage", "Sausage", "Snag", "Sausage"],
+                            ["Afternoon", "Afternoon", "Afternoon", "Arvo", "Arvo"],
+                        ],
+                    }
+                ],
+            }
+        )
+
     region = REGIONS.get(slug)
     if region:
         return render_template("region.html", nav=NAV, region=region)
