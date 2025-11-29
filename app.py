@@ -251,15 +251,131 @@ REGIONS = {
 },
 
     "great-britain": {
-        "title": "Great Britain",
-        "sections": [
-            {"title": "Culture", "content": "Короткое описание культуры Британии..."},
-            {"title": "History", "content": "Короткое описание истории..."},
-            {"title": "Attractions", "content": "Достопримечательности..."},
-            {"title": "Language", "content": "Особенности британского английского..."},
-        ],
-
-    },
+    "title": "Great Britain",
+    "sections": [
+        {
+            "title": "History of British Slang",
+            "content": (
+                "British slang has a rich and ancient history. As early as the 17th–18th centuries, "
+                "groups such as criminals, sailors, soldiers, and theatre performers developed their "
+                "own specialized vocabularies. These early slang words often expressed humor, sarcasm, "
+                "social criticism, or coded communication."
+            )
+        },
+        {
+            "title": "Early British Slang (17th–18th century)",
+            "content": (
+                "One of the earliest known slang dictionaries, 'The Dictionary of the Canting Crew' (1699), "
+                "recorded the secret language of thieves and beggars. Some early slang words entered "
+                "standard English and are still used today."
+            )
+        },
+        {
+            "title": "Examples (17th–18th century)",
+            "table": [
+                ["Slang word", "Meaning"],
+                ["Addle Pate", "A foolish or inconsiderate person"],
+                ["Bull Calf", "A clumsy, awkward fellow"],
+                ["Corny-Faced", "A face covered with pimples"],
+                ["Death’s Head Upon a Mop-Stick", "A miserable, skinny person"],
+                ["Fussock", "A messy, disorganized old woman"]
+            ]
+        },
+        {
+            "title": "British vs American English",
+            "content": (
+                "British English differs from American English in pronunciation, intonation, spelling, "
+                "vocabulary, and some grammar patterns. These differences developed over centuries of "
+                "independent evolution."
+            )
+        },
+        {
+            "title": "Pronunciation Differences",
+            "table": [
+                ["British English", "American English"],
+                ["Schedule — [ʃ]", "Schedule — [sk]"],
+                ["Either/neither — [ai]", "Either/neither — [i]"],
+                ["Mafia, Natasha — [æ]", "Mafia, Natasha — [a]"],
+                ["Better — [t]", "Better — [d]"],
+                ["City — [t]", "City — [d]"]
+            ]
+        },
+        {
+            "title": "Intonation Differences",
+            "content": (
+                "British English generally has a richer melodic intonation: the voice rises and falls more "
+                "noticeably. American English is more monotone and often spoken at a slightly higher pitch. "
+                "To many learners, British English sounds smooth and refined, while American English sounds "
+                "more direct and emphatic."
+            )
+        },
+        {
+            "title": "Spelling Differences",
+            "table": [
+                ["British English", "American English"],
+                ["Colour, honour", "Color, honor"],
+                ["Favourite", "Favorite"],
+                ["Centre, theatre", "Center, theater"],
+                ["Catalogue, dialogue", "Catalog, dialog"],
+                ["Realise, analyse", "Realize, analyze"],
+                ["Counsellor", "Counselor"],
+                ["Modelling", "Modeling"],
+                ["Encyclopaedia", "Encyclopedia"]
+            ]
+        },
+        {
+            "title": "Vocabulary Differences",
+            "content": "Britain and the United States often use completely different words for everyday objects."
+        },
+        {
+            "title": "Vocabulary Examples",
+            "table": [
+                ["British English", "American English"],
+                ["Autumn", "Fall"],
+                ["Ill", "Sick"],
+                ["Underground", "Subway"],
+                ["Petrol", "Gasoline"],
+                ["Shop", "Store"],
+                ["Luggage", "Baggage"],
+                ["Pharmacy", "Drugstore"]
+            ]
+        },
+        {
+            "title": "Grammar Differences",
+            "table": [
+                ["British English", "American English"],
+                ["I have read this book.", "I read this book."],
+                ["Have you got a brother?", "Do you have a brother?"],
+                ["At the weekend", "On the weekend"]
+            ]
+        },
+        {
+            "title": "British Slang",
+            "content": (
+                "British slang is expressive, witty, often ironic, and varies greatly by region. "
+                "It includes both traditional expressions and modern youth slang influenced by media, "
+                "music, and multicultural London English (MLE)."
+            )
+        },
+        {
+            "title": "Examples of British Slang",
+            "table": [
+                ["Slang", "Meaning"],
+                ["Alright?", "A casual greeting similar to 'How are you?'"],
+                ["Mate", "Friend, buddy, pal"],
+                ["Cheers", "Thank you / goodbye / good health"],
+                ["Luv / Love", "Friendly term of address"],
+                ["Spot on", "Exactly right"],
+                ["Bang on", "Absolutely correct"],
+                ["Not my cup of tea", "Not something I like"],
+                ["I can't be bothered", "I'm too lazy / I don't feel like it"],
+                ["That's rubbish!", "That's nonsense / bad"],
+                ["Gutted", "Very upset"],
+                ["Bloody hell!", "Strong emotion: surprise, anger, or frustration"]
+            ]
+        }
+    ]
+},
 }
 
 @app.route("/")
