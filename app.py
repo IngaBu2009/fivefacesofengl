@@ -64,33 +64,115 @@ REGIONS = {
         ]
     },
     "new-zealand": {
-        "title": "New Zealand",
-        "sections": [
+    "title": "New Zealand",
+    "sections": [
         {
-            "title": "Culture",
-            "content": "New Zealand has a rich blend of Māori and European (Pākehā) cultural traditions. "
-                       "The Māori language and customs play a major role in national identity, and concepts like "
-                       "‘whānau’ (family) and ‘mana’ (prestige/honour) are widely respected."
+            "title": "Overview of New Zealand English",
+            "content": (
+                "New Zealand English (NZE) is a distinctive variety that developed primarily from British and "
+                "Australian English influences. It is known for its unique vowel pronunciation, rising intonation, "
+                "borrowed Maori vocabulary, and friendly Kiwi slang. The accent closely resembles Australian English "
+                "but has several differences that make it recognisable worldwide."
+            )
         },
         {
-            "title": "History",
-            "content": "New Zealand was originally settled by the Māori people in the 13th century. "
-                       "European explorers arrived in the 17th century, and British colonization intensified in the 19th century. "
-                       "The Treaty of Waitangi (1840) is a foundational historical document."
+            "title": "History of New Zealand English",
+            "content": (
+                "New Zealand English formed in the 19th century when British settlers—mainly from southern England "
+                "and Scotland—arrived in the region. Maori people, the indigenous population, contributed greatly "
+                "to the vocabulary. Over time, the blend of British accents, isolation, and Maori influence shaped "
+                "a unique and cohesive national English variety."
+            )
         },
         {
-            "title": "Attractions",
-            "content": "New Zealand is famous for its breathtaking landscapes: fjords, volcanoes, beaches, and mountains. "
-                       "Popular destinations include Milford Sound, Rotorua, Tongariro National Park, and Hobbiton."
+            "title": "Pronunciation Features",
+            "content": (
+                "New Zealand English has several recognisable pronunciation features, especially its vowels."
+            )
         },
         {
-            "title": "Language",
-            "content": "New Zealand English has its own unique pronunciation and vocabulary. "
-                       "It includes many Māori loanwords such as ‘kia ora’ (hello), ‘kai’ (food) and ‘haka’ (dance/challenge). "
-                       "The accent is similar to Australian English, but softer and more vowel-shifted."
+            "title": "Pronunciation Examples",
+            "table": [
+                ["Feature", "Example"],
+                ["Short 'i' becomes 'uh'", "Fish and chips → 'fush and chups'"],
+                ["Flattened 'e' sound", "Pen sounds like 'pin'"],
+                ["Non-rhotic accent", "R not pronounced unless before a vowel"],
+                ["Rising intonation", "Statements often sound like questions"],
+                ["Closer vowels than Australian English", "Slightly tighter and sharper vowel sounds"]
+            ]
+        },
+        {
+            "title": "Vocabulary Features",
+            "content": (
+                "New Zealand English uses many Maori loanwords, and like Australian English, includes many shortened "
+                "and informal expressions. Many nature-related words are unique to the region."
+            )
+        },
+        {
+            "title": "Common Maori Loanwords",
+            "table": [
+                ["Word", "Meaning"],
+                ["Kia ora", "Hello / thank you / good health"],
+                ["Whānau", "Family"],
+                ["Kai", "Food / meal"],
+                ["Aroha", "Love / compassion"],
+                ["Puku", "Stomach"],
+                ["Mana", "Prestige, authority, respect"]
+            ]
+        },
+        {
+            "title": "Unique New Zealand Words",
+            "table": [
+                ["Word", "Meaning"],
+                ["Tramping", "Hiking"],
+                ["Jandals", "Flip-flops"],
+                ["Bach", "Small holiday house"],
+                ["Togs", "Swimsuit"],
+                ["Scroggin", "Trail mix"],
+                ["Dairy", "Small corner shop / convenience store"]
+            ]
+        },
+        {
+            "title": "New Zealand Slang",
+            "content": (
+                "Kiwi slang is friendly, humorous, and often overlaps with Australian slang, but many expressions "
+                "are uniquely New Zealand."
+            )
+        },
+        {
+            "title": "Examples of Kiwi Slang",
+            "table": [
+                ["Slang", "Meaning"],
+                ["Sweet as", "All good / perfect"],
+                ["Choice!", "Awesome / great"],
+                ["Bro / cuzzy", "Friend / close mate"],
+                ["Chur", "Thanks / cool / cheers"],
+                ["Hard out", "Definitely / absolutely"],
+                ["She’ll be right", "It will be fine"],
+                ["Yarn", "Chat / talk"],
+                ["Munted", "Broken / smashed / ruined"]
+            ]
+        },
+        {
+            "title": "Modern New Zealand Expressions",
+            "content": (
+                "Modern Kiwi English blends Maori vocabulary, youth slang, and global internet expressions."
+            )
+        },
+        {
+            "title": "Modern Examples",
+            "table": [
+                ["Slang", "Meaning"],
+                ["Ghost chips", "Acting stupid (from a famous NZ ad)"],
+                ["Skux", "Cool / stylish guy"],
+                ["Buzzy", "Strange but interesting"],
+                ["Wop-wops", "Very remote place"],
+                ["Eh?", "Used at the end of sentences for emphasis"]
+            ]
         }
     ]
 },
+
 
     "great-britain": {
         "title": "Great Britain",
