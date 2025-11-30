@@ -2,7 +2,6 @@ from flask import Flask, render_template, url_for
 
 app = Flask(__name__)
 
-# Навигация (копия структуры с сайта)
 NAV = [
     {"slug": "home", "title": "Home"},
     {"slug": "diversity", "title": "Diversity of words"},
@@ -13,7 +12,7 @@ NAV = [
     {"slug": "new-zealand", "title": "New Zealand"},
 ]
 
-# Контент главной страницы (основной текст с Google Sites)
+# Контент главной страницы
 HOME_CONTENT = {
     "title": "The 5 faces of English",
     #"lead": (
@@ -34,7 +33,7 @@ HOME_CONTENT = {
     #]
 }
 
-#егионов
+#страны
 REGIONS = {
     "america": {
         "title": "America",
