@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container" style="max-width: 400px; margin: auto; padding-top: 40px;">
+    <h1>Register</h1>
+
+    <form method="POST">
+        <label>Username</label>
+        <input type="text" name="username" class="form-control" required>
+
+        <label>Password</label>
+        <input type="password" name="password" class="form-control" required>
+
+        <button type="submit" class="btn">Register</button>
+    </form>
+
+    <p style="margin-top: 15px;">
+        Уже есть аккаунт?
+        <a href="{{ url_for('login') }}">Войти</a>
+    </p>
+</div>
+
+{% endblock %}

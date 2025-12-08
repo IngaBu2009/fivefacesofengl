@@ -1,12 +1,31 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
-from regions.america import REGION_AMERICA
-from regions.canada import REGION_CANADA
-from regions.greatbritain import REGION_GB
-from regions.australia import REGION_AU
-from regions.newzealand import REGION_NZ
-
+#настройка личного ключа безопасности
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your-secret-key-here-change-it-in-production'
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(120), nullable=False)
+
+    def set_password(self, password):
+        #сохраняет пароль
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        #соотвествует ли данный пароль прошлому паролю
+        return check_password_hash(self.password_hash, password)
+
+    def __repr__(self):
+        return f'<User {self.username}>'
 
 NAV = [
     {"slug": "home", "title": "Home"},
@@ -17,31 +36,24 @@ NAV = [
     {"slug": "great-britain", "title": "Great Britain"},
     {"slug": "new-zealand", "title": "New Zealand"},
     {"slug": "about", "title": "About"},
-
 ]
 
-# Контент главной страницы
 HOME_CONTENT = {
     "title": "The 5 faces of English",
-    #"lead": (
-    #   "Our project is called “Sweet, lollies and candies – choose your English” "
-    #    "because we decided to help people learn the variations of English in different Anglican countries. "
-    #    "And in particular in America, Great Britain, Canada and Australia."
-    # ),
     "why": [
-        "Cultural Immersion: Learning different varieties of English allows you to immerse yourself in different cultures and societies. Each country has its own unique traditions, customs and history, which are reflected in the language. Learning different varieties of English helps you understand local expressions, accents, and cultural nuances, which enriches your language skills and allows you to better understand and interact with native speakers.",
-        "Professional Opportunities: Learning different varieties of English can be beneficial for professional development. Some companies or industries may prefer a particular variation of English, and knowing that variation can be an advantage when looking for a job or advancing your career. For example, knowledge of British English can be useful when working in the UK or with British companies.",
-        "Linguistic diversity: Each variation of the English language has its own characteristics in grammar, pronunciation and vocabulary. Studying different variations allows us to delve deeper into these differences and better understand how language develops and adapts to different contexts. This may be especially interesting for people interested in linguistics and linguistics.",
-        "Travel and Communication: Learning different varieties of English makes it easier to travel and communicate with native speakers from different countries. When you travel, you encounter different accents and expressions, and knowing different varieties of English helps you better understand and be understood in different situations."
+        "Cultural Immersion: Learning different varieties of English allows you to immerse yourself in different cultures and societies...",
+        "Professional Opportunities: Learning different varieties of English can be beneficial for professional development...",
+        "Linguistic diversity: Each variation of the English language has its own characteristics...",
+        "Travel and Communication: Learning different varieties of English makes it easier to travel and communicate..."
     ],
-        #"sources": [
-        #    "https://www.planetware.com/tourist-attractions/australia-aus.htm",
-        #    "https://en.wikipedia.org/wiki/History_of_the_United_States",
-            # ... можно перечислить остальные источники
-    #]
 }
 
-#страны
+from regions.america import REGION_AMERICA
+from regions.canada import REGION_CANADA
+from regions.greatbritain import REGION_GB
+from regions.australia import REGION_AU
+from regions.newzealand import REGION_NZ
+
 REGIONS = {
     "great-britain": REGION_GB,
     "america": REGION_AMERICA,
@@ -50,10 +62,22 @@ REGIONS = {
     "new-zealand": REGION_NZ
 }
 
+#Создание таблиц базы данных при запуске
+with app.app_context():
+    db.create_all()
+
+
 
 @app.route("/")
 def index():
-    return render_template("index.html", nav=NAV, home=HOME_CONTENT)
+    if 'user_id' in session:
+        return redirect(url_for('login'))
+    else:
+        return redirect(url_for('login'))
+
+@app.route("/home")
+def home():
+    return render_template("home.html", nav=NAV)
 
 @app.route("/about/")
 def about():
@@ -62,12 +86,11 @@ def about():
 @app.route("/<slug>/")
 def page(slug):
     if slug == "home":
-        return index()
+        return redirect(url_for('home'))
     if slug == "diversity":
         return render_template(
             "region.html",
             nav=NAV,
-
             region={
                 "title": "Diversity of words",
                 "sections": [
@@ -95,6 +118,65 @@ def page(slug):
     if region:
         return render_template("region.html", nav=NAV, region=region)
     return render_template("region.html", nav=NAV, region={"title":"Not found","sections":[{"title":"404","content":"Страница не найдена"}]}), 404
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        #найти пользователя в базе данных по имени
+        user = User.query.filter_by(username=username).first()
+
+        #проверить, существует ли пользователь и правильный ли пароль
+        if user and user.check_password(password):
+            session['user_id'] = user.id
+            session['username'] = user.username
+            flash(f'Welcome, {user.username}!', 'success')
+            return redirect(url_for('home'))
+        else:
+            #ОШИБКА
+            flash('Invalid username or password', 'error')
+            return render_template("login.html", nav=NAV)
+
+    #если метод GET, просто отобразить форму
+    return render_template("login.html", nav=NAV)
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        #проверяем, существует ли уже пользователь с таким именем
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash('Username already exists. Please choose a different one.', 'error')
+            return render_template("register.html", nav=NAV)
+        #создаем нового пользователя
+        new_user = User(username=username)
+        new_user.set_password(password)
+
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Registration successful! Please log in.', 'success')
+            #после успешной регистрации перенаправить на страницу входа
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred during registration. Please try again.', 'error')
+            print(f"Database error: {e}")
+            return render_template("register.html", nav=NAV)
+
+    #если метод GET, просто отобразить форму
+    return render_template("register.html", nav=NAV)
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    session.pop('username', None)
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
     app.run(debug=True)

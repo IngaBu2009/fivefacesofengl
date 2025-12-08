@@ -4,10 +4,6 @@
     <h2>{{ home.title }}</h2>
     <p class="lead">{{ home.lead }}</p>
 
-    <div class="hero-image">
-      <img src="{{ url_for('static', filename='images/hero.jpg') }}" alt="Hero image">
-    </div>
-
     <h3>Why should you study variations of English?</h3>
     <ol>
       {% for item in home.why %}
