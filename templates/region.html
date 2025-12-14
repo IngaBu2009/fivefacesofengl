@@ -1,41 +1,55 @@
 {% extends "base.html" %}
 
+{% block title %}{{ region.title }} - English Varieties{% endblock %}
+
 {% block content %}
-<div class="region-page">
+    <h1>{{ region.title }}</h1>
 
-    <h2 class="region-title">{{ region.title }}</h2>
-
-    {% for sec in region.sections %}
-    <section class="region-section">
-
-        <h3>{{ sec.title }}</h3>
-
-        {% if sec.content %}
-            <p>{{ sec.content }}</p>
+    {% for section in region.sections %}
+        <h2>{{ section.title }}</h2>
+        {% if section.content %}
+            <p>{{ section.content }}</p>
         {% endif %}
 
-        {% if sec.table %}
-        <table class="word-table">
-            {% for row in sec.table %}
-                {% if loop.first %}
+        {% if section.table %}
+            <table>
+                {% for row in section.table %}
+                    {% set row_index = loop.index0 %}
                     <tr>
-                        {% for col in row %}
-                            <th>{{ col }}</th>
+                        {% for cell in row %}
+                            {% if loop.index0 == 0 %}
+                                <td><strong>{{ cell }}</strong></td>
+                            {% else %}
+                                {% if row_index == 1 and loop.index0 == 1 and cell == "Candy" %}
+                                    <td>
+                                        <span class="clickable-audio" data-audio="candy-usa">Candy</span>
+                                    </td>
+                                {% else %}
+                                    <td>{{ cell }}</td>
+                                {% endif %}
+                            {% endif %}
                         {% endfor %}
                     </tr>
-                {% else %}
-                    <tr>
-                        {% for col in row %}
-                            <td>{{ col }}</td>
-                        {% endfor %}
-                    </tr>
-                {% endif %}
-            {% endfor %}
-        </table>
+                {% endfor %}
+            </table>
         {% endif %}
-
-    </section>
     {% endfor %}
+{% endblock %}
 
-</div>
+{% block extra_js %}
+    <audio id="audio-candy-usa" src="{{ url_for('static', filename='audio/candy-usa.mp3') }}"></audio>
+    <script>
+        document.querySelectorAll('.clickable-audio').forEach(span => {
+            span.addEventListener('click', function() {
+                const audio = document.getElementById('audio-candy-usa');
+                if (audio) {
+                    audio.currentTime = 0;
+                    audio.play().catch(e => {
+                        console.warn("Audio play failed:", e);
+                        alert("Audio file not found or browser blocked playback.");
+                    });
+                }
+            });
+        });
+    </script>
 {% endblock %}

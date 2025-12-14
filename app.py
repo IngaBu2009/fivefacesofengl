@@ -31,7 +31,7 @@ class User(db.Model):
 
 NAV = [
     {"slug": "home", "title": "Home"},
-    {"slug": "diversity", "title": "Diversity of words"},
+    {"slug": "diversity", "title": "Diversity"},
     {"slug": "america", "title": "America"},
     {"slug": "canada", "title": "Canada"},
     {"slug": "australia", "title": "Australia"},
@@ -81,7 +81,7 @@ def index():
 
 @app.route("/home")
 def home():
-    return render_template("home.html", nav=NAV)
+    return render_template("home.html", nav=NAV, home_content=HOME_CONTENT)
 
 @app.route("/about/")
 def about():
@@ -122,6 +122,10 @@ def page(slug):
     if region:
         return render_template("region.html", nav=NAV, region=region)
     return render_template("region.html", nav=NAV, region={"title":"Not found","sections":[{"title":"404","content":"Страница не найдена"}]}), 404
+
+@app.route("/diversity")
+def diversity():
+    return render_template("diversity.html", nav=NAV, title="Diversity")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

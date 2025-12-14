@@ -1,41 +1,85 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{{ title if title else "The 5 faces of English" }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}English Varieties{% endblock %}</title>
+    <style>
+        /* Общие стили — можно вынести в static/css/style.css позже */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #fff;
+            color: #333;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        nav a {
+            text-decoration: none;
+            color: #007bff;
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f8f9fa;
+        }
+        nav a:hover {
+            background: #e9ecef;
+        }
+        .content {
+            max-width: 900px;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 20px 0;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .clickable-audio {
+            cursor: pointer;
+            color: #0066cc;
+            text-decoration: underline;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-  <header class="site-header">
-    <div class="wrap">
-      <h1><a href="{{ url_for('index') }}">The 5 faces of English</a></h1>
-      <nav>
-        <ul class="main-nav">
-          {% for item in nav %}
-            <li><a href="{{ url_for('page', slug=item.slug) }}">{{ item.title }}</a></li>
-          {% endfor %}
-            <a href="{{ url_for('profile') }}">Profile</a>
-
+    <nav>
+        <ul>
+            {% for item in nav %}
+                {% if item.slug == "home" %}
+                    <li><a href="{{ url_for('home') }}">{{ item.title }}</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('page', slug=item.slug) }}">{{ item.title }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if session.get('login') %}
+                <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('register') }}">Register</a></li>
+            {% endif %}
         </ul>
-      </nav>
-    </div>
-  </header>
+    </nav>
 
-  <main class="wrap">
-    {% block content %}{% endblock %}
-  </main>
-
-  <footer class="site-footer">
-    <div class="wrap">
+    <div class="content">
+        {% block content %}{% endblock %}
     </div>
 
-  </footer>
+    {% block extra_js %}{% endblock %}
 </body>
-<div class="top-right">
-    <a href="{{ url_for('login') }}">Login</a>
-    <a href="{{ url_for('register') }}">Register</a>
-
-</div>
-
 </html>
