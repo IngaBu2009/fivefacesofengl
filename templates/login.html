@@ -1,35 +1,15 @@
-<!-- login.html -->
 {% extends "base.html" %}
 
 {% block content %}
+<h2>Login</h2>
 
-<div class="container" style="max-width: 400px; margin: auto; padding-top: 40px;">
-    <h1>Login</h1>
+<form method="post">
+    <label>Login</label><br>
+    <input type="text" name="login" required><br><br>
 
-    {% with messages = get_flashed_messages(category_filter=['error']) %}
-        {% if messages %}
-            <div class="flash-messages-errors">
-                {% for message in messages %}
-                    <div class="alert alert-danger">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
+    <label>Password</label><br>
+    <input type="password" name="password" required><br><br>
 
-    <form method="POST">
-        <label>Username</label>
-        <input type="text" name="username" class="form-control" required>
-
-        <label>Password</label>
-        <input type="password" name="password" class="form-control" required>
-
-        <button type="submit" class="btn">Log in</button>
-    </form>
-
-    <p style="margin-top: 15px;">
-        Нет аккаунта?
-        <a href="{{ url_for('register') }}">Зарегистрироваться</a>
-    </p>
-</div>
-
+    <button type="submit">Login</button>
+</form>
 {% endblock %}

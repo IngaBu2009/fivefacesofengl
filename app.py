@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 
 #настройка личного ключа безопасности
 app = Flask(__name__)
@@ -9,6 +10,7 @@ app.config['SECRET_KEY'] = 'your-secret-key-here-change-it-in-production'
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = "super-secret-key"
 
 db = SQLAlchemy(app)
 class User(db.Model):
@@ -36,6 +38,8 @@ NAV = [
     {"slug": "great-britain", "title": "Great Britain"},
     {"slug": "new-zealand", "title": "New Zealand"},
     {"slug": "about", "title": "About"},
+   # {"slug": "profile", "title": "Profile"},
+
 ]
 
 HOME_CONTENT = {
@@ -122,25 +126,15 @@ def page(slug):
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
+        session["login"] = request.form.get("login")
+        session["password"] = request.form.get("password")
+        session["last_name"] = request.form.get("last_name")
+        session["email"] = request.form.get("email")
 
-        #найти пользователя в базе данных по имени
-        user = User.query.filter_by(username=username).first()
+        return redirect(url_for("profile"))
 
-        #проверить, существует ли пользователь и правильный ли пароль
-        if user and user.check_password(password):
-            session['user_id'] = user.id
-            session['username'] = user.username
-            flash(f'Welcome, {user.username}!', 'success')
-            return redirect(url_for('home'))
-        else:
-            #ОШИБКА
-            flash('Invalid username or password', 'error')
-            return render_template("login.html", nav=NAV)
-
-    #если метод GET, просто отобразить форму
     return render_template("login.html", nav=NAV)
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -178,5 +172,25 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
+@app.route("/profile")
+def profile():
+    login = session.get("login")
+    password = session.get("password")
+    last_name = session.get("last_name")
+    email = session.get("email")
+
+    return render_template(
+        "profile.html",
+        login=login,
+        password=password,
+        last_name=last_name,
+        email=email,
+        nav=NAV
+    )
+
+
 if __name__ == "__main__":
     app.run(debug=True)
+
+login_manager = LoginManager(app)
+login_manager.login_view = "login"
