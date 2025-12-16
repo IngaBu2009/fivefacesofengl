@@ -1,52 +1,58 @@
 {% extends "base.html" %}
 
-{% block title %}{{ region.title }} - English Varieties{% endblock %}
+{% block title %}{{ region.title | default('Region') }}{% endblock %}
 
 {% block content %}
-    <h1>{{ region.title }}</h1>
+    <h1>{{ region.title | default('Unknown Region') }}</h1>
 
-    {% for section in region.sections %}
-        <h2>{{ section.title }}</h2>
-        {% if section.content %}
-            <p>{{ section.content }}</p>
-        {% endif %}
+    {% if region.sections %}
+        {% for section in region.sections %}
+            <h2>{{ section.title | default('Section') }}</h2>
+            {% if section.content %}
+                <p>{{ section.content }}</p>
+            {% endif %}
 
-        {% if section.table %}
-            <table>
-                {% for row in section.table %}
-                    {% set row_index = loop.index0 %}
-                    <tr>
-                        {% for cell in row %}
-                            {% if loop.index0 == 0 %}
-                                <td><strong>{{ cell }}</strong></td>
-                            {% else %}
-                                {% if row_index == 1 and loop.index0 == 1 and cell == "Candy" %}
-                                    <td>
-                                        <span class="clickable-audio" data-audio="candy-usa">Candy</span>
-                                    </td>
+            {% if section.table %}
+                <table>
+                    {% for row in section.table %}
+                        {% set row_index = loop.index0 %}
+                        <tr>
+                            {% for cell in row %}
+                                {% if loop.index0 == 0 %}
+                                    <td><strong>{{ cell }}</strong></td>
                                 {% else %}
-                                    <td>{{ cell }}</td>
+                                    {% if row_index == 1 and loop.index0 == 1 and cell == "Candy" %}
+                                        <td><span class="clickable-audio" data-audio="candy-usa">Candy</span></td>
+                                    {% elif row_index == 1 and loop.index0 == 2 and cell == "Sweets" %}
+                                        <td><span class="clickable-audio" data-audio="sweets-uk">Sweets</span></td>
+                                    {% else %}
+                                        <td>{{ cell }}</td>
+                                    {% endif %}
                                 {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            </table>
-        {% endif %}
-    {% endfor %}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p>No content available for this region.</p>
+    {% endif %}
 {% endblock %}
 
 {% block extra_js %}
     <audio id="audio-candy-usa" src="{{ url_for('static', filename='audio/candy-usa.mp3') }}"></audio>
+    <audio id="audio-sweets-uk" src="{{ url_for('static', filename='audio/sweets-uk.mp3') }}"></audio>
     <script>
         document.querySelectorAll('.clickable-audio').forEach(span => {
             span.addEventListener('click', function() {
-                const audio = document.getElementById('audio-candy-usa');
+                const audioId = this.dataset.audio;
+                const audio = document.getElementById(`audio-${audioId}`);
                 if (audio) {
                     audio.currentTime = 0;
                     audio.play().catch(e => {
-                        console.warn("Audio play failed:", e);
-                        alert("Audio file not found or browser blocked playback.");
+                        console.warn("Audio playback failed:", e);
+                        alert("Audio not available.");
                     });
                 }
             });
