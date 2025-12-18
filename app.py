@@ -71,6 +71,45 @@ with app.app_context():
     db.create_all()
 
 
+import random
+
+DIALECT_TESTS = {
+    "American English": [
+        "Candy",
+        "Trash can",
+        "Sidewalk",
+        "Gas station",
+        "Apartment"
+    ],
+    "British English": [
+        "Sweets",
+        "Bin",
+        "Pavement",
+        "Petrol station",
+        "Flat"
+    ],
+    "Canadian English": [
+        "Toque",
+        "Washroom",
+        "Loonie",
+        "Double-double",
+        "Eh"
+    ],
+    "Australian English": [
+        "Lollies",
+        "Arvo",
+        "Thongs",
+        "Servo",
+        "Brekkie"
+    ],
+    "New Zealand English": [
+        "Jandals",
+        "Dairy",
+        "Chilly bin",
+        "Sweet as",
+        "Togs"
+    ]
+}
 
 @app.route("/")
 def index():
@@ -105,13 +144,13 @@ def page(slug):
                     {
                         "title": "Vocabulary Comparison Table",
                         "table": [
-                            ["Object", "USA", "UK", "Australia", "New Zealand"],
-                            ["Candy / Sweet", "Candy", "Sweets", "Lollies", "Lollies"],
-                            ["Flip-flops", "Flip-flops", "Flip-flops", "Thongs", "Jandals"],
-                            ["Sweater", "Sweater", "Jumper", "Jumper", "Jumper"],
-                            ["Garbage bin", "Trash can", "Bin", "Bin", "Rubbish bin"],
-                            ["Sausage", "Sausage", "Sausage", "Snag", "Sausage"],
-                            ["Afternoon", "Afternoon", "Afternoon", "Arvo", "Arvo"],
+                            ["Object", "USA", "UK","Canada", "Australia", "New Zealand"],
+                            ["Candy / Sweet", "Candy", "Sweets","Candy", "Lollies", "Lollies"],
+                            ["Flip-flops", "Flip-flops", "Flip-flops", "Flip-flops", "Thongs", "Jandals"],
+                            ["Sweater", "Sweater", "Jumper", "Jumper", "Jumper", "Jumper"],
+                            ["Garbage bin", "Trash can", "Bin", "Bin", "Bin", "Rubbish bin"],
+                            ["Sausage", "Sausage", "Sausage","Sausage", "Snag", "Sausage"],
+                            ["Afternoon", "Afternoon", "Afternoon","Afternoon", "Arvo", "Arvo"],
                         ],
                     }
                 ],
@@ -127,17 +166,39 @@ def page(slug):
 def diversity():
     return render_template("diversity.html", nav=NAV, title="Diversity")
 
+@app.route("/dialect-test")
+def dialect_test():
+    dialect, words = random.choice(list(DIALECT_TESTS.items()))
+
+    return render_template(
+        "dialect_test.html",
+        nav=NAV,
+        dialect=dialect,
+        words=words,
+        title="Dialect Recognition Test"
+    )
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        session["login"] = request.form.get("login")
-        session["password"] = request.form.get("password")
-        session["last_name"] = request.form.get("last_name")
-        session["email"] = request.form.get("email")
+        username = request.form.get("login")
+        password = request.form.get("password")
 
-        return redirect(url_for("profile"))
+        user = User.query.filter_by(username=username).first()
+
+        if user and user.check_password(password):
+            # сохраняем данные в session
+            session["login"] = user.username
+            session["password"] = password  # учебный вариант
+            session["last_name"] = request.form.get("last_name")
+            session["email"] = request.form.get("email")
+
+            return redirect(url_for("profile"))
+        else:
+            flash("Invalid username or password", "error")
 
     return render_template("login.html", nav=NAV)
+
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -192,6 +253,9 @@ def profile():
         nav=NAV
     )
 
+@app.route("/test")
+def test():
+    return render_template("test.html", nav=NAV, title="Dialect Test")
 
 if __name__ == "__main__":
     app.run(debug=True)

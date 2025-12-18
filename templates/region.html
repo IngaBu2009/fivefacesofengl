@@ -13,27 +13,44 @@
             {% endif %}
 
             {% if section.table %}
-                <table>
-                    {% for row in section.table %}
-                        {% set row_index = loop.index0 %}
-                        <tr>
-                            {% for cell in row %}
-                                {% if loop.index0 == 0 %}
-                                    <td><strong>{{ cell }}</strong></td>
-                                {% else %}
-                                    {% if row_index == 1 and loop.index0 == 1 and cell == "Candy" %}
-                                        <td><span class="clickable-audio" data-audio="candy-usa">Candy</span></td>
-                                    {% elif row_index == 1 and loop.index0 == 2 and cell == "Sweets" %}
-                                        <td><span class="clickable-audio" data-audio="sweets-uk">Sweets</span></td>
-                                    {% else %}
-                                        <td>{{ cell }}</td>
-                                    {% endif %}
-                                {% endif %}
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </table>
-            {% endif %}
+    <table>
+        {% for row in section.table %}
+            {% set row_index = loop.index0 %}
+            <tr>
+                {% for cell in row %}
+                    {% if loop.index0 == 0 %}
+                        <!-- Заголовок "Object" -->
+                        <td><strong>{{ cell }}</strong></td>
+                    {% else %}
+                        <!-- Определяем регион по столбцу -->
+                        {% set country = section.table[0][loop.index0] %}
+                        {% set object_name = section.table[row_index][0] %}
+
+                        <!-- Генерируем audio_id только для значимых строк (начиная с 1) -->
+                        {% if row_index >= 1 and cell and cell != "-" %}
+                            <!-- Сопоставляем регион с кодом -->
+                            {% set country_code = {
+                                "USA": "us",
+                                "UK": "uk",
+                                "Australia": "au",
+                                "New Zealand": "nz"
+                            }[country] or "en" %}
+
+                            <!-- Пример: candy-us, sweets-uk, lollies-au -->
+                            {% set audio_id = (cell | lower | replace(" ", "-")) + "-" + country_code %}
+
+                            <td>
+                                <span class="clickable-audio" data-audio="{{ audio_id }}">{{ cell }}</span>
+                            </td>
+                        {% else %}
+                            <td>{{ cell }}</td>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
         {% endfor %}
     {% else %}
         <p>No content available for this region.</p>
@@ -41,21 +58,56 @@
 {% endblock %}
 
 {% block extra_js %}
-    <audio id="audio-candy-usa" src="{{ url_for('static', filename='audio/candy-usa.mp3') }}"></audio>
-    <audio id="audio-sweets-uk" src="{{ url_for('static', filename='audio/sweets-uk.mp3') }}"></audio>
-    <script>
-        document.querySelectorAll('.clickable-audio').forEach(span => {
-            span.addEventListener('click', function() {
-                const audioId = this.dataset.audio;
-                const audio = document.getElementById(`audio-${audioId}`);
-                if (audio) {
-                    audio.currentTime = 0;
-                    audio.play().catch(e => {
-                        console.warn("Audio playback failed:", e);
-                        alert("Audio not available.");
-                    });
-                }
-            });
+<!-- USA -->
+<audio id="audio-candy-us" src="{{ url_for('static', filename='audio/candy-us.mp3') }}"></audio>
+<audio id="audio-flip-flops-us" src="{{ url_for('static', filename='audio/flip-flops-us.mp3') }}"></audio>
+<audio id="audio-sweater-us" src="{{ url_for('static', filename='audio/sweater-us.mp3') }}"></audio>
+<audio id="audio-trash-can-us" src="{{ url_for('static', filename='audio/trash-can-us.mp3') }}"></audio>
+<audio id="audio-sausage-us" src="{{ url_for('static', filename='audio/sausage-us.mp3') }}"></audio>
+<audio id="audio-afternoon-us" src="{{ url_for('static', filename='audio/afternoon-us.mp3') }}"></audio>
+
+<!-- UK -->
+<audio id="audio-sweets-uk" src="{{ url_for('static', filename='audio/sweets-uk.mp3') }}"></audio>
+<audio id="audio-flip-flops-uk" src="{{ url_for('static', filename='audio/flip-flops-uk.mp3') }}"></audio>
+<audio id="audio-jumper-uk" src="{{ url_for('static', filename='audio/jumper-uk.mp3') }}"></audio>
+<audio id="audio-bin-uk" src="{{ url_for('static', filename='audio/bin-uk.mp3') }}"></audio>
+<audio id="audio-sausage-uk" src="{{ url_for('static', filename='audio/sausage-uk.mp3') }}"></audio>
+<audio id="audio-afternoon-uk" src="{{ url_for('static', filename='audio/afternoon-uk.mp3') }}"></audio>
+
+<!-- Canada
+<audio id="audio-candy-ca" src="{{ url_for('static', filename='audio/candy-ca.mp3') }}"></audio>
+<audio id="audio-flip-flops-ca" src="{{ url_for('static', filename='audio/flip-flops-ca.mp3') }}"></audio>
+<audio id="audio-jumper-ca" src="{{ url_for('static', filename='audio/jumper-ca.mp3') }}"></audio>
+<audio id="audio-bin-ca" src="{{ url_for('static', filename='audio/bin-ca.mp3') }}"></audio>
+<audio id="audio-sausage-ca" src="{{ url_for('static', filename='audio/sausage-ca.mp3') }}"></audio>
+<audio id="audio-afternoon-ca" src="{{ url_for('static', filename='audio/afternoon-ca.mp3') }}"></audio>
+-->
+<!-- Australia
+<audio id="audio-lollies-au" src="{{ url_for('static', filename='audio/lollies-au.mp3') }}"></audio>
+<audio id="audio-thongs-au" src="{{ url_for('static', filename='audio/thongs-au.mp3') }}"></audio>
+<audio id="audio-jumper-au" src="{{ url_for('static', filename='audio/jumper-au.mp3') }}"></audio>
+<audio id="audio-bin-au" src="{{ url_for('static', filename='audio/bin-au.mp3') }}"></audio>
+<audio id="audio-snag-au" src="{{ url_for('static', filename='audio/snag-au.mp3') }}"></audio>
+<audio id="audio-arvo-au" src="{{ url_for('static', filename='audio/arvo-au.mp3') }}"></audio>
+ -->
+<!-- New Zealand
+<audio id="audio-lollies-nz" src="{{ url_for('static', filename='audio/lollies-nz.mp3') }}"></audio>
+<audio id="audio-jandals-nz" src="{{ url_for('static', filename='audio/jandals-nz.mp3') }}"></audio>
+<audio id="audio-jumper-nz" src="{{ url_for('static', filename='audio/jumper-nz.mp3') }}"></audio>
+<audio id="audio-rubbish-bin-nz" src="{{ url_for('static', filename='audio/rubbish-bin-nz.mp3') }}"></audio>
+<audio id="audio-sausage-nz" src="{{ url_for('static', filename='audio/sausage-nz.mp3') }}"></audio>
+<audio id="audio-arvo-nz" src="{{ url_for('static', filename='audio/arvo-nz.mp3') }}"></audio>
+-->
+<script>
+    document.querySelectorAll('.clickable-audio').forEach(span => {
+        span.addEventListener('click', function() {
+            const audioId = this.dataset.audio;
+            const audio = document.getElementById(`audio-${audioId}`);
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play().catch(e => console.warn("Playback failed:", e));
+            }
         });
-    </script>
+    });
+</script>
 {% endblock %}

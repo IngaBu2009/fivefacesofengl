@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>What’s your English dialect?</h2>
+
+<style>
+  .question {
+    display: none;
+    margin-top: 20px;
+  }
+
+  .question.active {
+    display: block;
+  }
+
+  button {
+    margin: 5px;
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+</style>
+
+<div id="test">
+
+  <div class="question active">
+    <p><strong>1. What do you call a sweet treat?</strong></p>
+    <button onclick="answer('us')">Candy</button>
+    <button onclick="answer('uk')">Sweets</button>
+    <button onclick="answer('au')">Lollies</button>
+  </div>
+
+  <div class="question">
+    <p><strong>2. What do you call this? 🗑️</strong></p>
+    <button onclick="answer('us')">Trash can</button>
+    <button onclick="answer('uk')">Bin</button>
+    <button onclick="answer('au')">Rubbish bin</button>
+  </div>
+
+  <div class="question">
+    <p><strong>3. What do you wear when it’s cold?</strong></p>
+    <button onclick="answer('us')">Sweater</button>
+    <button onclick="answer('uk')">Jumper</button>
+  </div>
+
+  <div class="question">
+    <p><strong>4. How do you say “afternoon” informally?</strong></p>
+    <button onclick="answer('au')">Arvo</button>
+    <button onclick="answer('us')">Afternoon</button>
+  </div>
+
+  <div class="question">
+    <p><strong>5. What do you call flip-flops?</strong></p>
+    <button onclick="answer('us')">Flip-flops</button>
+    <button onclick="answer('au')">Thongs</button>
+    <button onclick="answer('nz')">Jandals</button>
+  </div>
+
+  <div class="question" id="result">
+    <h3>Your result:</h3>
+    <p id="result-text"></p>
+    <button onclick="location.reload()">Try again</button>
+  </div>
+
+</div>
+
+<script>
+  let current = 0;
+  const questions = document.querySelectorAll(".question");
+
+  const score = {
+    us: 0,
+    uk: 0,
+    au: 0,
+    nz: 0
+  };
+
+  function answer(dialect) {
+    score[dialect]++;
+
+    questions[current].classList.remove("active");
+    current++;
+
+    if (current < questions.length - 1) {
+      questions[current].classList.add("active");
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    let winner = "us";
+    let max = 0;
+
+    for (let key in score) {
+      if (score[key] > max) {
+        max = score[key];
+        winner = key;
+      }
+    }
+
+    const results = {
+      us: "🇺🇸 American English",
+      uk: "🇬🇧 British English",
+      au: "🇦🇺 Australian English",
+      nz: "🇳🇿 New Zealand English"
+    };
+
+    document.getElementById("result-text").innerText = results[winner];
+    document.getElementById("result").classList.add("active");
+  }
+</script>
+
+{% endblock %}

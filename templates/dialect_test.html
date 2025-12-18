@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Can you recognize the dialect?</h2>
+
+<p>
+  Look at the words below and choose which English dialect they belong to.
+</p>
+
+<ul>
+  {% for word in words %}
+    <li><strong>{{ word }}</strong></li>
+  {% endfor %}
+</ul>
+
+<form method="post" onsubmit="return checkAnswer()">
+  <button type="button" onclick="guess('American English')">American</button>
+  <button type="button" onclick="guess('British English')">British</button>
+  <button type="button" onclick="guess('Canadian English')">Canadian</button>
+  <button type="button" onclick="guess('Australian English')">Australian</button>
+  <button type="button" onclick="guess('New Zealand English')">New Zealand</button>
+</form>
+
+<p id="result" style="margin-top:20px;font-weight:bold;"></p>
+
+<button onclick="location.reload()">Try another dialect</button>
+
+<script>
+  const correct = "{{ dialect }}";
+
+  function guess(answer) {
+    const result = document.getElementById("result");
+
+    if (answer === correct) {
+      result.innerText = "✅ Correct! This is " + correct;
+      result.style.color = "green";
+    } else {
+      result.innerText = "❌ Wrong. Correct answer: " + correct;
+      result.style.color = "red";
+    }
+  }
+</script>
+
+{% endblock %}
