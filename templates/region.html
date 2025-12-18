@@ -19,24 +19,21 @@
             <tr>
                 {% for cell in row %}
                     {% if loop.index0 == 0 %}
-                        <!-- Заголовок "Object" -->
                         <td><strong>{{ cell }}</strong></td>
                     {% else %}
                         <!-- Определяем регион по столбцу -->
                         {% set country = section.table[0][loop.index0] %}
                         {% set object_name = section.table[row_index][0] %}
 
-                        <!-- Генерируем audio_id только для значимых строк (начиная с 1) -->
                         {% if row_index >= 1 and cell and cell != "-" %}
-                            <!-- Сопоставляем регион с кодом -->
                             {% set country_code = {
                                 "USA": "us",
                                 "UK": "uk",
+                                "Canada": "ca",
                                 "Australia": "au",
                                 "New Zealand": "nz"
                             }[country] or "en" %}
 
-                            <!-- Пример: candy-us, sweets-uk, lollies-au -->
                             {% set audio_id = (cell | lower | replace(" ", "-")) + "-" + country_code %}
 
                             <td>
@@ -74,30 +71,30 @@
 <audio id="audio-sausage-uk" src="{{ url_for('static', filename='audio/sausage-uk.mp3') }}"></audio>
 <audio id="audio-afternoon-uk" src="{{ url_for('static', filename='audio/afternoon-uk.mp3') }}"></audio>
 
-<!-- Canada
+<!-- Canada-->
 <audio id="audio-candy-ca" src="{{ url_for('static', filename='audio/candy-ca.mp3') }}"></audio>
 <audio id="audio-flip-flops-ca" src="{{ url_for('static', filename='audio/flip-flops-ca.mp3') }}"></audio>
 <audio id="audio-jumper-ca" src="{{ url_for('static', filename='audio/jumper-ca.mp3') }}"></audio>
 <audio id="audio-bin-ca" src="{{ url_for('static', filename='audio/bin-ca.mp3') }}"></audio>
 <audio id="audio-sausage-ca" src="{{ url_for('static', filename='audio/sausage-ca.mp3') }}"></audio>
 <audio id="audio-afternoon-ca" src="{{ url_for('static', filename='audio/afternoon-ca.mp3') }}"></audio>
--->
-<!-- Australia
+
+<!-- Australia -->
 <audio id="audio-lollies-au" src="{{ url_for('static', filename='audio/lollies-au.mp3') }}"></audio>
 <audio id="audio-thongs-au" src="{{ url_for('static', filename='audio/thongs-au.mp3') }}"></audio>
 <audio id="audio-jumper-au" src="{{ url_for('static', filename='audio/jumper-au.mp3') }}"></audio>
 <audio id="audio-bin-au" src="{{ url_for('static', filename='audio/bin-au.mp3') }}"></audio>
 <audio id="audio-snag-au" src="{{ url_for('static', filename='audio/snag-au.mp3') }}"></audio>
 <audio id="audio-arvo-au" src="{{ url_for('static', filename='audio/arvo-au.mp3') }}"></audio>
- -->
-<!-- New Zealand
+
+<!-- New Zealand-->
 <audio id="audio-lollies-nz" src="{{ url_for('static', filename='audio/lollies-nz.mp3') }}"></audio>
 <audio id="audio-jandals-nz" src="{{ url_for('static', filename='audio/jandals-nz.mp3') }}"></audio>
 <audio id="audio-jumper-nz" src="{{ url_for('static', filename='audio/jumper-nz.mp3') }}"></audio>
 <audio id="audio-rubbish-bin-nz" src="{{ url_for('static', filename='audio/rubbish-bin-nz.mp3') }}"></audio>
 <audio id="audio-sausage-nz" src="{{ url_for('static', filename='audio/sausage-nz.mp3') }}"></audio>
 <audio id="audio-arvo-nz" src="{{ url_for('static', filename='audio/arvo-nz.mp3') }}"></audio>
--->
+
 <script>
     document.querySelectorAll('.clickable-audio').forEach(span => {
         span.addEventListener('click', function() {
