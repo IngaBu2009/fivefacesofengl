@@ -1,85 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}English Varieties{% endblock %}</title>
-    <style>
-        /* Общие стили — можно вынести в static/css/style.css позже */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: #fff;
-            color: #333;
-        }
-        nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 20px 0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        nav a {
-            text-decoration: none;
-            color: #007bff;
-            padding: 6px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: #f8f9fa;
-        }
-        nav a:hover {
-            background: #e9ecef;
-        }
-        .content {
-            max-width: 900px;
-        }
-        table {
-            border-collapse: collapse;
-            margin: 20px 0;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .clickable-audio {
-            cursor: pointer;
-            color: #0066cc;
-            text-decoration: underline;
-        }
-    </style>
-    {% block extra_css %}{% endblock %}
+  <meta charset="utf-8">
+  <title>{{ title if title else "The 5 Faces of English" }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
+<div class="background-shapes">
+  <div class="shape blue"></div>
+  <div class="shape purple"></div>
+</div>
+
+<header class="header">
+  <div class="container header-inner">
+    <a class="logo" href="{{ url_for('home') }}">The 5 Faces of English</a>
+
     <nav>
-        <ul>
-            {% for item in nav %}
-                {% if item.slug == "home" %}
-                    <li><a href="{{ url_for('home') }}">{{ item.title }}</a></li>
-                {% else %}
-                    <li><a href="{{ url_for('page', slug=item.slug) }}">{{ item.title }}</a></li>
-                {% endif %}
-            {% endfor %}
-            {% if session.get('login') %}
-                <li><a href="{{ url_for('profile') }}">Profile</a></li>
-                <li><a href="{{ url_for('logout') }}">Logout</a></li>
-            {% else %}
-                <li><a href="{{ url_for('login') }}">Login</a></li>
-                <li><a href="{{ url_for('register') }}">Register</a></li>
-            {% endif %}
-        </ul>
+      {% for item in nav %}
+        <a href="{{ url_for('page', slug=item.slug) }}">{{ item.title }}</a>
+      {% endfor %}
+      <a class="auth" href="{{ url_for('login') }}">Login</a>
     </nav>
+  </div>
+</header>
 
-    <div class="content">
-        {% block content %}{% endblock %}
-    </div>
+<main class="container">
+  {% block content %}{% endblock %}
+</main>
 
-    {% block extra_js %}{% endblock %}
+<footer class="footer">
+  <p>© 2025 The 5 Faces of English</p>
+</footer>
+
+{% block extra_js %}{% endblock %}
+
 </body>
+
 </html>

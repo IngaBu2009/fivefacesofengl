@@ -1,44 +1,35 @@
 {% extends "base.html" %}
 
-{% block title %}{{ home_content.title }}{% endblock %}
-
 {% block content %}
 
-    <h2>Our project</h2>
-    <p>Our project is called “Sweet, lollies and candies – choose your English” because we decided to help people learn the variations of English in different Anglican countries. And in particular in America, Great Britain, Canada and Australia.</p>
+<section class="hero">
+  <h1>The 5 Faces of English</h1>
+  <p>
+    Explore how English changes across the world — from vocabulary to culture.
+    Discover your dialect and learn to understand them all.
+  </p>
+</section>
 
-    <h2>Why should you study variations of English?</h2>
-    <p>There are many benefits of learning different varieties of English such as American, British, Australian and Canadian:</p>
+<section class="cards">
 
-    <ol>
-        <li>
-            <strong>Cultural Immersion:</strong> Learning different varieties of English allows you to immerse yourself in different cultures and societies. Each country has its own unique traditions, customs and history, which are reflected in the language. Learning different varieties of English helps you understand local expressions, accents, and cultural nuances, which enriches your language skills and allows you to better understand and interact with native speakers.
-        </li>
-        <li>
-            <strong>Professional Opportunities:</strong> Learning different varieties of English can be beneficial for professional development. Some companies or industries may prefer a particular variation of English, and knowing that variation can be an advantage when looking for a job or advancing your career. For example, knowledge of British English can be useful when working in the UK or with British companies.
-        </li>
-        <li>
-            <strong>Linguistic diversity:</strong> Each variation of the English language has its own characteristics in grammar, pronunciation and vocabulary. Studying different variations allows us to delve deeper into these differences and better understand how language develops and adapts to different contexts. This may be especially interesting for people interested in linguistics and linguistics.
-        </li>
-        <li>
-            <strong>Travel and Communication:</strong> Learning different varieties of English makes it easier to travel and communicate with native speakers from different countries. When you travel, you encounter different accents and expressions, and knowing different varieties of English helps you better understand and be understood in different situations. Overall, learning different varieties of English allows you to diversify your language skills, immerse yourself in different cultures, and expand your professional opportunities. This opens the door to new acquaintances, experiences and understanding of the world in general.
-        </li>
-    </ol>
-    <ul>
-        {% for reason in home_content.why %}
-            <li>{{ reason }}</li>
-        {% endfor %}
-    </ul>
+  <div class="card">
+    <h3>Dialect Test</h3>
+    <p>Find out which English dialect fits you best.</p>
+    <a href="{{ url_for('test') }}">Take test →</a>
+  </div>
 
-    <p>Start exploring by choosing a region from the menu above!</p>
-    <h2>Test your English dialect</h2>
+  <div class="card">
+    <h3>Vocabulary Diversity</h3>
+    <p>Compare words across English-speaking countries.</p>
+    <a href="{{ url_for('page', slug='diversity') }}">Explore →</a>
+  </div>
 
-<p>
-  Want to know which English dialect suits you best?
-</p>
+  <div class="card">
+    <h3>Regions</h3>
+    <p>Learn about English in different countries.</p>
+    <a href="{{ url_for('page', slug='america') }}">Start →</a>
+  </div>
 
-<a href="{{ url_for('test') }}" class="test-link">
-  Take the test →</a>
-    <a href="{{ url_for('dialect_test') }}">Dialect recognition test →</a>
+</section>
 
 {% endblock %}

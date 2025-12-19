@@ -1,60 +1,83 @@
 {% extends "base.html" %}
 
-{% block title %}{{ region.title | default('Region') }}{% endblock %}
+{% block title %}
+  {{ region.title | default('Region') }}
+{% endblock %}
 
 {% block content %}
-    <h1>{{ region.title | default('Unknown Region') }}</h1>
+  <h1>{{ region.title | default('Unknown Region') }}</h1>
 
-    {% if region.sections %}
-        {% for section in region.sections %}
-            <h2>{{ section.title | default('Section') }}</h2>
-            {% if section.content %}
-                <p>{{ section.content }}</p>
-            {% endif %}
+  {% if region.sections %}
+    {% for section in region.sections %}
+      <h2>{{ section.title | default('Section') }}</h2>
 
-            {% if section.table %}
-    <table>
-        {% for row in section.table %}
+      {% if section.content %}
+        <p>{{ section.content }}</p>
+      {% endif %}
+
+      {% if section.table %}
+
+        {% if region.title == "Diversity of words" %}
+        <div class="diversity-page">
+        {% endif %}
+
+        <table>
+          {% for row in section.table %}
             {% set row_index = loop.index0 %}
             <tr>
-                {% for cell in row %}
-                    {% if loop.index0 == 0 %}
-                        <td><strong>{{ cell }}</strong></td>
-                    {% else %}
-                        <!-- Определяем регион по столбцу -->
-                        {% set country = section.table[0][loop.index0] %}
-                        {% set object_name = section.table[row_index][0] %}
+              {% for cell in row %}
+                {% if loop.index0 == 0 %}
+                  <td><strong>{{ cell }}</strong></td>
+                {% else %}
+                  {% set country = section.table[0][loop.index0] %}
 
-                        {% if row_index >= 1 and cell and cell != "-" %}
-                            {% set country_code = {
-                                "USA": "us",
-                                "UK": "uk",
-                                "Canada": "ca",
-                                "Australia": "au",
-                                "New Zealand": "nz"
-                            }[country] or "en" %}
+                  {% if row_index >= 1 and cell and cell != "-" %}
+                    {% set country_code = {
+                      "USA": "us",
+                      "UK": "uk",
+                      "Canada": "ca",
+                      "Australia": "au",
+                      "New Zealand": "nz"
+                    }[country] %}
 
-                            {% set audio_id = (cell | lower | replace(" ", "-")) + "-" + country_code %}
+                    {% set audio_id = (cell | lower | replace(" ", "-")) ~ "-" ~ country_code %}
 
-                            <td>
-                                <span class="clickable-audio" data-audio="{{ audio_id }}">{{ cell }}</span>
-                            </td>
-                        {% else %}
-                            <td>{{ cell }}</td>
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
+                    <td>
+                      {% if region.title == "Diversity of words" %}
+                        <span
+                          class="clickable-audio"
+                          data-audio="{{ audio_id }}"
+                        >
+                          {{ cell }}
+                        </span>
+                      {% else %}
+                        {{ cell }}
+                      {% endif %}
+                    </td>
+                  {% else %}
+                    <td>{{ cell }}</td>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
             </tr>
-        {% endfor %}
-    </table>
-{% endif %}
-        {% endfor %}
-    {% else %}
-        <p>No content available for this region.</p>
-    {% endif %}
+          {% endfor %}
+        </table>
+
+        {% if region.title == "Diversity of words" %}
+        </div>
+        {% endif %}
+
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    <p>No content available for this region.</p>
+  {% endif %}
 {% endblock %}
 
 {% block extra_js %}
+
+{% if region.title == "Diversity of words" %}
+
 <!-- USA -->
 <audio id="audio-candy-us" src="{{ url_for('static', filename='audio/candy-us.mp3') }}"></audio>
 <audio id="audio-flip-flops-us" src="{{ url_for('static', filename='audio/flip-flops-us.mp3') }}"></audio>
@@ -71,7 +94,7 @@
 <audio id="audio-sausage-uk" src="{{ url_for('static', filename='audio/sausage-uk.mp3') }}"></audio>
 <audio id="audio-afternoon-uk" src="{{ url_for('static', filename='audio/afternoon-uk.mp3') }}"></audio>
 
-<!-- Canada-->
+<!-- Canada -->
 <audio id="audio-candy-ca" src="{{ url_for('static', filename='audio/candy-ca.mp3') }}"></audio>
 <audio id="audio-flip-flops-ca" src="{{ url_for('static', filename='audio/flip-flops-ca.mp3') }}"></audio>
 <audio id="audio-jumper-ca" src="{{ url_for('static', filename='audio/jumper-ca.mp3') }}"></audio>
@@ -87,7 +110,7 @@
 <audio id="audio-snag-au" src="{{ url_for('static', filename='audio/snag-au.mp3') }}"></audio>
 <audio id="audio-arvo-au" src="{{ url_for('static', filename='audio/arvo-au.mp3') }}"></audio>
 
-<!-- New Zealand-->
+<!-- New Zealand -->
 <audio id="audio-lollies-nz" src="{{ url_for('static', filename='audio/lollies-nz.mp3') }}"></audio>
 <audio id="audio-jandals-nz" src="{{ url_for('static', filename='audio/jandals-nz.mp3') }}"></audio>
 <audio id="audio-jumper-nz" src="{{ url_for('static', filename='audio/jumper-nz.mp3') }}"></audio>
@@ -96,15 +119,37 @@
 <audio id="audio-arvo-nz" src="{{ url_for('static', filename='audio/arvo-nz.mp3') }}"></audio>
 
 <script>
-    document.querySelectorAll('.clickable-audio').forEach(span => {
-        span.addEventListener('click', function() {
-            const audioId = this.dataset.audio;
-            const audio = document.getElementById(`audio-${audioId}`);
-            if (audio) {
-                audio.currentTime = 0;
-                audio.play().catch(e => console.warn("Playback failed:", e));
-            }
-        });
+  let currentAudio = null;
+  let currentWord = null;
+
+  document.querySelectorAll('.diversity-page .clickable-audio').forEach(span => {
+    span.addEventListener('click', function () {
+      const audioId = this.dataset.audio;
+      const audio = document.getElementById(`audio-${audioId}`);
+
+      if (!audio) return;
+
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
+      if (currentWord) {
+        currentWord.classList.remove("playing");
+      }
+
+      currentAudio = audio;
+      currentWord = this;
+
+      this.classList.add("playing");
+      audio.currentTime = 0;
+      audio.play();
+
+      audio.onended = () => {
+        this.classList.remove("playing");
+      };
     });
+  });
 </script>
+
+{% endif %}
 {% endblock %}
