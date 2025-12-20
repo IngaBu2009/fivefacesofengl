@@ -1,13 +1,43 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Profile</h2>
+<div class="profile-page">
+  <div class="profile-layout">
 
-<div style="margin-top: 20px;">
-    <p><strong>Login:</strong> {{ login }}</p>
-    <p><strong>Password:</strong> {{ password }}</p>
-    <p><strong>Last name:</strong> {{ last_name }}</p>
-    <p><strong>Email:</strong> {{ email }}</p>
+    <!-- SIDEBAR -->
+    <aside class="profile-sidebar">
+      <div class="avatar"></div>
 
+      <h2>{{ user.username }}</h2>
+      <p class="profile-subtitle">English learner</p>
+
+      <form method="post" id="profile-form">
+        <label>Email</label>
+        <input type="email" name="email" value="{{ user.email or '' }}">
+
+        <label>Last name</label>
+        <input type="text" name="last_name" value="{{ user.last_name or '' }}">
+
+        <button class="save-btn">Save profile</button>
+      </form>
+    </aside>
+
+    <!-- MAIN -->
+    <section class="profile-main">
+
+      <div class="profile-card">
+        <h3>👀 Interests</h3>
+        <textarea name="interests" form="profile-form">{{ user.interests or '' }}</textarea>
+      </div>
+
+      <div class="profile-card">
+        <h3>📊 Activity</h3>
+        <p>Dialect tests completed: <strong>3</strong></p>
+        <p>Words learned: <strong>42</strong></p>
+      </div>
+
+    </section>
+
+  </div>
 </div>
 {% endblock %}

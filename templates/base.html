@@ -27,12 +27,30 @@
       {% for item in nav %}
         <a href="{{ url_for('page', slug=item.slug) }}">{{ item.title }}</a>
       {% endfor %}
-      <a class="auth" href="{{ url_for('login') }}">Login</a>
+
     </nav>
+    <div class="top-right">
+  {% if session.get("user_id") %}
+    <a href="{{ url_for('profile') }}">Profile</a>
+    <!--<a href="{{ url_for('logout') }}">Logout</a>-->
+  {% else %}
+    <a href="{{ url_for('login') }}">Login</a>
+  {% endif %}
+    </div>
   </div>
 </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-wrapper">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 
 <main class="container">
+
   {% block content %}{% endblock %}
 </main>
 

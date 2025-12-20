@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
+from functools import wraps
 
 #настройка личного ключа безопасности
 app = Flask(__name__)
@@ -13,17 +14,27 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = "super-secret-key"
 
 db = SQLAlchemy(app)
+def login_required_custom(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not session.get("user_id"):
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return wrapper
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
 
+    email = db.Column(db.String(120))
+    last_name = db.Column(db.String(120))
+    interests = db.Column(db.Text)
+
     def set_password(self, password):
-        #сохраняет пароль
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
-        #соотвествует ли данный пароль прошлому паролю
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
@@ -186,18 +197,18 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-        if user and user.check_password(password):
-            # сохраняем данные в session
-            session["login"] = user.username
-            session["password"] = password  # учебный вариант
-            session["last_name"] = request.form.get("last_name")
-            session["email"] = request.form.get("email")
+        if not user or not user.check_password(password):
+            flash("Incorrect login or password", "error")
+            return render_template("login.html", nav=NAV)
 
-            return redirect(url_for("profile"))
-        else:
-            flash("Invalid username or password", "error")
+        # успешный вход
+        session["user_id"] = user.id
+        session["username"] = user.username
+
+        return redirect(url_for("home"))
 
     return render_template("login.html", nav=NAV)
+
 
 
 
@@ -206,29 +217,26 @@ def register():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        #проверяем, существует ли уже пользователь с таким именем
-        existing_user = User.query.filter_by(username=username).first()
-        if existing_user:
-            flash('Username already exists. Please choose a different one.', 'error')
+
+        if User.query.filter_by(username=username).first():
+            flash("Username already exists", "error")
             return render_template("register.html", nav=NAV)
-        #создаем нового пользователя
+
         new_user = User(username=username)
         new_user.set_password(password)
 
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-            flash('Registration successful! Please log in.', 'success')
-            #после успешной регистрации перенаправить на страницу входа
-            return redirect(url_for('login'))
-        except Exception as e:
-            db.session.rollback()
-            flash('An error occurred during registration. Please try again.', 'error')
-            print(f"Database error: {e}")
-            return render_template("register.html", nav=NAV)
+        db.session.add(new_user)
+        db.session.commit()
 
-    #если метод GET, просто отобразить форму
+        # авто-вход после регистрации
+        session["user_id"] = new_user.id
+        session["username"] = new_user.username
+
+        flash("Registration successful!", "success")
+        return redirect(url_for("home"))
+
     return render_template("register.html", nav=NAV)
+
 
 @app.route('/logout')
 def logout():
@@ -237,19 +245,23 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
-@app.route("/profile")
+@app.route("/profile", methods=["GET", "POST"])
+@login_required_custom
 def profile():
-    login = session.get("login")
-    password = session.get("password")
-    last_name = session.get("last_name")
-    email = session.get("email")
+    user = User.query.get(session["user_id"])
+
+    if request.method == "POST":
+        user.email = request.form.get("email")
+        user.last_name = request.form.get("last_name")
+        user.interests = request.form.get("interests")
+
+        db.session.commit()
+        flash("Profile updated successfully", "success")
+        return redirect(url_for("profile"))
 
     return render_template(
         "profile.html",
-        login=login,
-        password=password,
-        last_name=last_name,
-        email=email,
+        user=user,
         nav=NAV
     )
 
