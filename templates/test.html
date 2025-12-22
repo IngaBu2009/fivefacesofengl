@@ -1,89 +1,175 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>What’s your English dialect?</h2>
-
-<style>
-  .question {
-    display: none;
-    margin-top: 20px;
-  }
-
-  .question.active {
-    display: block;
-  }
-
-  button {
-    margin: 5px;
-    padding: 8px 14px;
-    cursor: pointer;
-  }
-</style>
-
-<div id="test">
-
-  <div class="question active">
-    <p><strong>1. What do you call a sweet treat?</strong></p>
-    <button onclick="answer('us')">Candy</button>
-    <button onclick="answer('uk')">Sweets</button>
-    <button onclick="answer('au')">Lollies</button>
+<div class="test-container">
+  <div class="test-header">
+    <h1>What's your English dialect?</h1>
+    <p class="test-subtitle">Answer a few questions to discover which English dialect matches your vocabulary!</p>
   </div>
 
-  <div class="question">
-    <p><strong>2. What do you call this? 🗑️</strong></p>
-    <button onclick="answer('us')">Trash can</button>
-    <button onclick="answer('uk')">Bin</button>
-    <button onclick="answer('au')">Rubbish bin</button>
+  <div class="test-progress">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <p class="progress-text"><span id="currentQuestion">1</span> / <span id="totalQuestions">5</span></p>
   </div>
 
-  <div class="question">
-    <p><strong>3. What do you wear when it’s cold?</strong></p>
-    <button onclick="answer('us')">Sweater</button>
-    <button onclick="answer('uk')">Jumper</button>
-  </div>
+  <div id="test" class="test-wrapper">
+    <div class="question active">
+      <div class="question-number">Question 1</div>
+      <h2 class="question-text">What do you call a sweet treat?</h2>
+      <div class="options-grid">
+        <button class="option-btn" onclick="answer('us')">
+          <span class="option-label">Candy</span>
+          <span class="option-hint">🇺🇸 American</span>
+        </button>
+        <button class="option-btn" onclick="answer('uk')">
+          <span class="option-label">Sweets</span>
+          <span class="option-hint">🇬🇧 British</span>
+        </button>
+        <button class="option-btn" onclick="answer('au')">
+          <span class="option-label">Lollies</span>
+          <span class="option-hint">🇦🇺 Australian</span>
+        </button>
+      </div>
+    </div>
 
-  <div class="question">
-    <p><strong>4. How do you say “afternoon” informally?</strong></p>
-    <button onclick="answer('au')">Arvo</button>
-    <button onclick="answer('us')">Afternoon</button>
-  </div>
+    <div class="question">
+      <div class="question-number">Question 2</div>
+      <h2 class="question-text">What do you call this? 🗑️</h2>
+      <div class="options-grid">
+        <button class="option-btn" onclick="answer('us')">
+          <span class="option-label">Trash can</span>
+          <span class="option-hint">🇺🇸 American</span>
+        </button>
+        <button class="option-btn" onclick="answer('uk')">
+          <span class="option-label">Bin</span>
+          <span class="option-hint">🇬🇧 British</span>
+        </button>
+        <button class="option-btn" onclick="answer('au')">
+          <span class="option-label">Rubbish bin</span>
+          <span class="option-hint">🇦🇺 Australian</span>
+        </button>
+      </div>
+    </div>
 
-  <div class="question">
-    <p><strong>5. What do you call flip-flops?</strong></p>
-    <button onclick="answer('us')">Flip-flops</button>
-    <button onclick="answer('au')">Thongs</button>
-    <button onclick="answer('nz')">Jandals</button>
-  </div>
+    <div class="question">
+      <div class="question-number">Question 3</div>
+      <h2 class="question-text">What do you wear when it's cold?</h2>
+      <div class="options-grid">
+        <button class="option-btn" onclick="answer('us')">
+          <span class="option-label">Sweater</span>
+          <span class="option-hint">🇺🇸 American</span>
+        </button>
+        <button class="option-btn" onclick="answer('uk')">
+          <span class="option-label">Jumper</span>
+          <span class="option-hint">🇬🇧 British</span>
+        </button>
+        <button class="option-btn" onclick="answer('ca')">
+          <span class="option-label">Jumper</span>
+          <span class="option-hint">🇨🇦 Canadian</span>
+        </button>
+      </div>
+    </div>
 
-  <div class="question" id="result">
-    <h3>Your result:</h3>
-    <p id="result-text"></p>
-    <button onclick="location.reload()">Try again</button>
-  </div>
+    <div class="question">
+      <div class="question-number">Question 4</div>
+      <h2 class="question-text">How do you say "afternoon" informally?</h2>
+      <div class="options-grid">
+        <button class="option-btn" onclick="answer('au')">
+          <span class="option-label">Arvo</span>
+          <span class="option-hint">🇦🇺 Australian</span>
+        </button>
+        <button class="option-btn" onclick="answer('nz')">
+          <span class="option-label">Arvo</span>
+          <span class="option-hint">🇳🇿 New Zealand</span>
+        </button>
+        <button class="option-btn" onclick="answer('us')">
+          <span class="option-label">Afternoon</span>
+          <span class="option-hint">🇺🇸 American</span>
+        </button>
+      </div>
+    </div>
 
+    <div class="question">
+      <div class="question-number">Question 5</div>
+      <h2 class="question-text">What do you call flip-flops?</h2>
+      <div class="options-grid">
+        <button class="option-btn" onclick="answer('us')">
+          <span class="option-label">Flip-flops</span>
+          <span class="option-hint">🇺🇸 American</span>
+        </button>
+        <button class="option-btn" onclick="answer('au')">
+          <span class="option-label">Thongs</span>
+          <span class="option-hint">🇦🇺 Australian</span>
+        </button>
+        <button class="option-btn" onclick="answer('nz')">
+          <span class="option-label">Jandals</span>
+          <span class="option-hint">🇳🇿 New Zealand</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="question result-question" id="result">
+      <div class="result-content">
+        <div class="result-icon">🎯</div>
+        <h2 class="result-title">Your English Dialect Is:</h2>
+        <div class="result-dialect" id="result-text"></div>
+        <p class="result-description" id="result-description"></p>
+        <button class="retry-btn" onclick="location.reload()">
+          <span>🔄 Try Again</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
   let current = 0;
-  const questions = document.querySelectorAll(".question");
+  const questions = document.querySelectorAll(".question:not(.result-question)");
+  const totalQuestions = questions.length;
 
   const score = {
     us: 0,
     uk: 0,
     au: 0,
-    nz: 0
+    nz: 0,
+    ca: 0
   };
+
+  // Инициализация первого вопроса
+  document.addEventListener('DOMContentLoaded', function() {
+    if (questions.length > 0) {
+      questions[0].classList.add("active", "fade-in");
+      updateProgress();
+    }
+  });
+
+  function updateProgress() {
+    const progress = ((current + 1) / totalQuestions) * 100;
+    document.getElementById("progressFill").style.width = progress + "%";
+    document.getElementById("currentQuestion").textContent = current + 1;
+  }
 
   function answer(dialect) {
     score[dialect]++;
 
-    questions[current].classList.remove("active");
-    current++;
+    // Анимация исчезновения текущего вопроса
+    const currentQuestionEl = document.querySelector(".question.active:not(.result-question)");
+    if (currentQuestionEl) {
+      currentQuestionEl.classList.add("fade-out");
+      
+      setTimeout(() => {
+        currentQuestionEl.classList.remove("active", "fade-out", "fade-in");
+        current++;
 
-    if (current < questions.length - 1) {
-      questions[current].classList.add("active");
-    } else {
-      showResult();
+        if (current < totalQuestions) {
+          questions[current].classList.add("active", "fade-in");
+          updateProgress();
+        } else {
+          showResult();
+        }
+      }, 300);
     }
   }
 
@@ -99,15 +185,22 @@
     }
 
     const results = {
-      us: "🇺🇸 American English",
-      uk: "🇬🇧 British English",
-      au: "🇦🇺 Australian English",
-      nz: "🇳🇿 New Zealand English"
+      us: { name: "🇺🇸 American English", desc: "You prefer American vocabulary! Words like 'candy', 'trash can', and 'sidewalk' are part of your everyday language." },
+      uk: { name: "🇬🇧 British English", desc: "You lean towards British English! You use terms like 'sweets', 'bin', and 'pavement' in your daily speech." },
+      au: { name: "🇦🇺 Australian English", desc: "G'day! You favor Australian English! You're comfortable with 'lollies', 'thongs', and 'arvo'." },
+      nz: { name: "🇳🇿 New Zealand English", desc: "Sweet as! You prefer New Zealand English! Words like 'jandals' and 'dairy' are in your vocabulary." },
+      ca: { name: "🇨🇦 Canadian English", desc: "Eh! You prefer Canadian English! You use terms like 'toque', 'washroom', and 'double-double'." }
     };
 
-    document.getElementById("result-text").innerText = results[winner];
-    document.getElementById("result").classList.add("active");
+    const result = results[winner];
+    document.getElementById("result-text").innerHTML = result.name;
+    document.getElementById("result-description").innerText = result.desc;
+    document.getElementById("result").classList.add("active", "fade-in");
+    document.getElementById("progressFill").style.width = "100%";
+    document.getElementById("currentQuestion").textContent = totalQuestions;
   }
-</script>
 
+  // Инициализация прогресса
+  updateProgress();
+</script>
 {% endblock %}

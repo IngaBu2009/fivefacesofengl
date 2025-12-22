@@ -1,44 +1,107 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Can you recognize the dialect?</h2>
+<div class="dialect-test-container">
+  <div class="test-header">
+    <h1>Dialect Recognition Challenge</h1>
+    <p class="test-subtitle">Can you identify which English dialect these words belong to? Test your knowledge!</p>
+  </div>
 
-<p>
-  Look at the words below and choose which English dialect they belong to.
-</p>
+  <div class="dialect-words-card">
+    <div class="words-header">
+      <h2>Study these words carefully:</h2>
+    </div>
+    <div class="words-list">
+      {% for word in words %}
+        <div class="word-badge">
+          <strong>{{ word }}</strong>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
 
-<ul>
-  {% for word in words %}
-    <li><strong>{{ word }}</strong></li>
-  {% endfor %}
-</ul>
+  <div class="guess-section">
+    <h3>Which dialect do these words belong to?</h3>
+    <div class="dialect-buttons">
+      <button class="dialect-btn" onclick="guess('American English')">
+        <span class="dialect-flag">🇺🇸</span>
+        <span class="dialect-name">American</span>
+      </button>
+      <button class="dialect-btn" onclick="guess('British English')">
+        <span class="dialect-flag">🇬🇧</span>
+        <span class="dialect-name">British</span>
+      </button>
+      <button class="dialect-btn" onclick="guess('Canadian English')">
+        <span class="dialect-flag">🇨🇦</span>
+        <span class="dialect-name">Canadian</span>
+      </button>
+      <button class="dialect-btn" onclick="guess('Australian English')">
+        <span class="dialect-flag">🇦🇺</span>
+        <span class="dialect-name">Australian</span>
+      </button>
+      <button class="dialect-btn" onclick="guess('New Zealand English')">
+        <span class="dialect-flag">🇳🇿</span>
+        <span class="dialect-name">New Zealand</span>
+      </button>
+    </div>
+  </div>
 
-<form method="post" onsubmit="return checkAnswer()">
-  <button type="button" onclick="guess('American English')">American</button>
-  <button type="button" onclick="guess('British English')">British</button>
-  <button type="button" onclick="guess('Canadian English')">Canadian</button>
-  <button type="button" onclick="guess('Australian English')">Australian</button>
-  <button type="button" onclick="guess('New Zealand English')">New Zealand</button>
-</form>
+  <div id="result" class="result-message"></div>
 
-<p id="result" style="margin-top:20px;font-weight:bold;"></p>
-
-<button onclick="location.reload()">Try another dialect</button>
+  <div class="test-actions">
+    <button class="new-challenge-btn" onclick="location.reload()">
+      <span>🔄 Try Another Challenge</span>
+    </button>
+  </div>
+</div>
 
 <script>
   const correct = "{{ dialect }}";
+  let answered = false;
 
   function guess(answer) {
+    if (answered) return;
+    
+    answered = true;
     const result = document.getElementById("result");
+    result.classList.add("show");
+
+    // Disable all buttons
+    document.querySelectorAll(".dialect-btn").forEach(btn => {
+      btn.disabled = true;
+      if (btn.querySelector(".dialect-name").textContent.trim() === answer.replace(" English", "")) {
+        if (answer === correct) {
+          btn.classList.add("correct");
+        } else {
+          btn.classList.add("wrong");
+        }
+      }
+      if (btn.querySelector(".dialect-name").textContent.trim() === correct.replace(" English", "")) {
+        btn.classList.add("correct-answer");
+      }
+    });
 
     if (answer === correct) {
-      result.innerText = "✅ Correct! This is " + correct;
-      result.style.color = "green";
+      result.innerHTML = `
+        <div class="result-success">
+          <div class="result-icon">✅</div>
+          <div class="result-content">
+            <h3>Correct!</h3>
+            <p>These words belong to <strong>${correct}</strong>. Well done! 🎉</p>
+          </div>
+        </div>
+      `;
     } else {
-      result.innerText = "❌ Wrong. Correct answer: " + correct;
-      result.style.color = "red";
+      result.innerHTML = `
+        <div class="result-error">
+          <div class="result-icon">❌</div>
+          <div class="result-content">
+            <h3>Not quite right</h3>
+            <p>The correct answer is <strong>${correct}</strong>. Keep learning! 💪</p>
+          </div>
+        </div>
+      `;
     }
   }
 </script>
-
 {% endblock %}

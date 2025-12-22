@@ -38,5 +38,44 @@
 
 </section>
 
+<section class="slang-facts-section">
+  <h2 style="margin-top: 80px; margin-bottom: 40px; font-size: 36px;">Slang Facts</h2>
+  <p style="color: var(--muted); font-size: 18px; margin-bottom: 40px; max-width: 620px;">
+    Discover and share interesting facts about slang in different English-speaking regions.
+  </p>
+
+  <div class="cards">
+    <div class="card">
+      <h3>American English</h3>
+      <p>Explore interesting facts about American slang.</p>
+      <a href="{{ url_for('slang_facts', region='america') }}">View Facts →</a>
+    </div>
+
+    <div class="card">
+      <h3>British English</h3>
+      <p>Learn about fascinating British slang facts.</p>
+      <a href="{{ url_for('slang_facts', region='great-britain') }}">View Facts →</a>
+    </div>
+
+    <div class="card">
+      <h3>Canadian English</h3>
+      <p>Discover interesting Canadian slang stories.</p>
+      <a href="{{ url_for('slang_facts', region='canada') }}">View Facts →</a>
+    </div>
+
+    <div class="card">
+      <h3>Australian English</h3>
+      <p>Explore unique Australian slang facts.</p>
+      <a href="{{ url_for('slang_facts', region='australia') }}">View Facts →</a>
+    </div>
+
+    <div class="card">
+      <h3>New Zealand English</h3>
+      <p>Learn about New Zealand slang facts.</p>
+      <a href="{{ url_for('slang_facts', region='new-zealand') }}">View Facts →</a>
+    </div>
+  </div>
+</section>
+
 
 {% endblock %}
