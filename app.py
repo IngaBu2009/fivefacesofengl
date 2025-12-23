@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
@@ -13,6 +14,14 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = "super-secret-key"
+
+# Настройки для загрузки файлов
+UPLOAD_FOLDER = os.path.join(basedir, 'static', 'avatars')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
+# Создаем папку для аватаров, если её нет
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 db = SQLAlchemy(app)
 def login_required_custom(f):
@@ -31,6 +40,7 @@ class User(db.Model):
     email = db.Column(db.String(120))
     last_name = db.Column(db.String(120))
     interests = db.Column(db.Text)
+    avatar_filename = db.Column(db.String(255))
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -53,6 +63,21 @@ class SlangFact(db.Model):
 
     def __repr__(self):
         return f'<SlangFact {self.region}: {self.title}>'
+
+class SlangWord(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    word = db.Column(db.String(100), nullable=False)
+    region = db.Column(db.String(50), nullable=False)
+    meaning = db.Column(db.Text, nullable=False)
+    example = db.Column(db.Text)  # Пример использования
+    part_of_speech = db.Column(db.String(50))  # noun, verb, adjective, etc.
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Nullable for system words
+    is_system = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<SlangWord {self.word} ({self.region})>'
 
 NAV = [
     {"slug": "home", "title": "Home"},
@@ -165,6 +190,11 @@ DEFAULT_SLANG_FACTS = {
     ]
 }
 
+def allowed_file(filename):
+    """Проверяет, разрешено ли расширение файла"""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 def migrate_slang_fact_table():
     """Миграция: добавляет колонку is_system, если её нет"""
     from sqlalchemy import inspect, text
@@ -186,6 +216,92 @@ def migrate_slang_fact_table():
     except Exception as e:
         # Таблица не существует, db.create_all() создаст её с правильной структурой
         print(f"Table slang_fact doesn't exist yet, will be created by db.create_all(): {e}")
+
+def migrate_user_table():
+    """Миграция: добавляет колонку avatar_filename, если её нет"""
+    from sqlalchemy import inspect, text
+    try:
+        inspector = inspect(db.engine)
+        if 'user' in inspector.get_table_names():
+            columns = [col['name'] for col in inspector.get_columns('user')]
+            
+            if 'avatar_filename' not in columns:
+                try:
+                    db.session.execute(text("ALTER TABLE user ADD COLUMN avatar_filename VARCHAR(255)"))
+                    db.session.commit()
+                    print("Migration: Added avatar_filename column to user table")
+                except Exception as e:
+                    print(f"Migration error: {e}")
+                    db.session.rollback()
+    except Exception as e:
+        print(f"Table user doesn't exist yet, will be created by db.create_all(): {e}")
+
+# Предустановленные сленговые слова
+DEFAULT_SLANG_WORDS = {
+    "america": [
+        {"word": "What's up?", "meaning": "Universal casual greeting", "example": "Hey, what's up? How's it going?", "part_of_speech": "phrase"},
+        {"word": "I'm down", "meaning": "I agree or I'm willing to participate", "example": "Want to go to the movies? Yeah, I'm down!", "part_of_speech": "phrase"},
+        {"word": "My bad", "meaning": "My mistake, I'm sorry", "example": "I forgot your book. My bad!", "part_of_speech": "phrase"},
+        {"word": "That's sick", "meaning": "That's amazing or awesome", "example": "Did you see that trick? That's sick!", "part_of_speech": "phrase"},
+        {"word": "Cool", "meaning": "Good, acceptable, or stylish", "example": "That's a cool idea!", "part_of_speech": "adjective"},
+    ],
+    "great-britain": [
+        {"word": "Mate", "meaning": "Friend, buddy, pal", "example": "Cheers, mate! Thanks for your help.", "part_of_speech": "noun"},
+        {"word": "Cheers", "meaning": "Thank you or goodbye", "example": "Cheers for the lift!", "part_of_speech": "interjection"},
+        {"word": "Spot on", "meaning": "Exactly right", "example": "Your answer was spot on!", "part_of_speech": "phrase"},
+        {"word": "Not my cup of tea", "meaning": "Not something I like", "example": "Horror movies aren't my cup of tea.", "part_of_speech": "phrase"},
+        {"word": "Gutted", "meaning": "Very upset or disappointed", "example": "I was gutted when I missed the concert.", "part_of_speech": "adjective"},
+        {"word": "Bloody hell", "meaning": "Expression of strong emotion", "example": "Bloody hell! That was close!", "part_of_speech": "phrase"},
+    ],
+    "canada": [
+        {"word": "Eh", "meaning": "Seeking agreement or confirmation", "example": "It's cold today, eh?", "part_of_speech": "interjection"},
+        {"word": "Toque", "meaning": "Winter hat or beanie", "example": "Don't forget your toque, it's freezing!", "part_of_speech": "noun"},
+        {"word": "Double-double", "meaning": "Coffee with two creams and two sugars (from Tim Hortons)", "example": "I'll have a double-double, please.", "part_of_speech": "noun"},
+        {"word": "Loonie", "meaning": "One dollar coin", "example": "I need a loonie for the parking meter.", "part_of_speech": "noun"},
+        {"word": "Washroom", "meaning": "Restroom, bathroom", "example": "Excuse me, where's the washroom?", "part_of_speech": "noun"},
+    ],
+    "australia": [
+        {"word": "Arvo", "meaning": "Afternoon", "example": "See you this arvo!", "part_of_speech": "noun"},
+        {"word": "Brekkie", "meaning": "Breakfast", "example": "What did you have for brekkie?", "part_of_speech": "noun"},
+        {"word": "Thongs", "meaning": "Flip-flops", "example": "Put on your thongs, we're going to the beach!", "part_of_speech": "noun"},
+        {"word": "Fair dinkum", "meaning": "Genuine, true, honest", "example": "Is that fair dinkum? Really?", "part_of_speech": "phrase"},
+        {"word": "Crikey", "meaning": "Expression of surprise", "example": "Crikey! Look at that kangaroo!", "part_of_speech": "interjection"},
+        {"word": "Snag", "meaning": "Sausage", "example": "Want a snag at the barbecue?", "part_of_speech": "noun"},
+    ],
+    "new-zealand": [
+        {"word": "Sweet as", "meaning": "Great, awesome, no problem", "example": "That sounds sweet as!", "part_of_speech": "phrase"},
+        {"word": "Jandals", "meaning": "Flip-flops", "example": "Wear your jandals to the beach.", "part_of_speech": "noun"},
+        {"word": "Chur", "meaning": "Thanks, cheers, or cool", "example": "Chur bro, appreciate it!", "part_of_speech": "interjection"},
+        {"word": "Dairy", "meaning": "Corner store or convenience store", "example": "I'm going to the dairy for some milk.", "part_of_speech": "noun"},
+        {"word": "Chilly bin", "meaning": "Cooler or icebox", "example": "Don't forget the chilly bin for the picnic.", "part_of_speech": "noun"},
+        {"word": "She'll be right", "meaning": "Everything will be fine", "example": "Don't worry, she'll be right!", "part_of_speech": "phrase"},
+    ]
+}
+
+def init_default_slang_words():
+    """Инициализирует предустановленные сленговые слова в базе данных"""
+    for region, words in DEFAULT_SLANG_WORDS.items():
+        for word_data in words:
+            # Проверяем, не существует ли уже такое слово
+            existing = SlangWord.query.filter_by(
+                region=region,
+                word=word_data["word"],
+                is_system=True
+            ).first()
+            
+            if not existing:
+                new_word = SlangWord(
+                    region=region,
+                    word=word_data["word"],
+                    meaning=word_data["meaning"],
+                    example=word_data.get("example", ""),
+                    part_of_speech=word_data.get("part_of_speech", ""),
+                    user_id=None,
+                    is_system=True
+                )
+                db.session.add(new_word)
+    
+    db.session.commit()
 
 def init_default_slang_facts():
     """Инициализирует предустановленные факты о сленге в базе данных"""
@@ -214,7 +330,9 @@ def init_default_slang_facts():
 with app.app_context():
     db.create_all()
     migrate_slang_fact_table()
+    migrate_user_table()
     init_default_slang_facts()
+    init_default_slang_words()
 
 
 import random
@@ -390,8 +508,41 @@ def profile():
         user.last_name = request.form.get("last_name")
         user.interests = request.form.get("interests")
 
+        # Обработка загрузки аватара
+        if 'avatar' in request.files:
+            file = request.files['avatar']
+            if file and file.filename and allowed_file(file.filename):
+                # Проверяем размер файла
+                file.seek(0, os.SEEK_END)
+                file_length = file.tell()
+                file.seek(0)
+                
+                if file_length > MAX_FILE_SIZE:
+                    flash("File is too large. Maximum size is 5MB.", "error")
+                else:
+                    # Удаляем старый аватар, если он существует
+                    if user.avatar_filename:
+                        old_avatar_path = os.path.join(UPLOAD_FOLDER, user.avatar_filename)
+                        if os.path.exists(old_avatar_path):
+                            try:
+                                os.remove(old_avatar_path)
+                            except Exception as e:
+                                print(f"Error removing old avatar: {e}")
+                    
+                    # Генерируем уникальное имя файла
+                    file_ext = file.filename.rsplit('.', 1)[1].lower()
+                    filename = secure_filename(f"{user.id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}.{file_ext}")
+                    
+                    # Сохраняем файл
+                    file.save(os.path.join(UPLOAD_FOLDER, filename))
+                    user.avatar_filename = filename
+                    flash("Avatar updated successfully", "success")
+            elif file and file.filename:
+                flash("Invalid file type. Allowed types: PNG, JPG, JPEG, GIF, WEBP", "error")
+
         db.session.commit()
-        flash("Profile updated successfully", "success")
+        if 'avatar' not in request.files or not request.files['avatar'].filename:
+            flash("Profile updated successfully", "success")
         return redirect(url_for("profile"))
 
     return render_template(
@@ -403,6 +554,11 @@ def profile():
 @app.route("/test")
 def test():
     return render_template("test.html", nav=NAV, title="Dialect Test")
+
+@app.route('/avatars/<filename>')
+def uploaded_avatar(filename):
+    """Маршрут для отображения аватаров"""
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 REGION_NAMES = {
     "america": "American English",
@@ -506,6 +662,133 @@ def delete_slang_fact(region, fact_id):
     db.session.commit()
     flash("Fact deleted successfully!", "success")
     return redirect(url_for("slang_facts", region=region))
+
+@app.route("/slang-dictionary", methods=["GET", "POST"])
+def slang_dictionary():
+    """Страница словаря сленга с поиском и фильтрацией"""
+    region_filter = request.args.get("region", "all")
+    search_query = request.args.get("search", "").strip()
+    
+    query = SlangWord.query
+    
+    if region_filter != "all":
+        query = query.filter_by(region=region_filter)
+    
+    if search_query:
+        query = query.filter(
+            db.or_(
+                SlangWord.word.ilike(f"%{search_query}%"),
+                SlangWord.meaning.ilike(f"%{search_query}%")
+            )
+        )
+    
+    # Сначала системные слова, затем пользовательские
+    words = query.order_by(
+        SlangWord.is_system.desc(),
+        SlangWord.word.asc()
+    ).all()
+    
+    return render_template(
+        "slang_dictionary.html",
+        nav=NAV,
+        words=words,
+        region_filter=region_filter,
+        search_query=search_query,
+        regions=REGION_NAMES,
+        title="Slang Dictionary"
+    )
+
+@app.route("/slang-dictionary/add", methods=["GET", "POST"])
+@login_required_custom
+def add_slang_word():
+    """Добавление нового слова в словарь"""
+    if request.method == "POST":
+        word = request.form.get("word", "").strip()
+        region = request.form.get("region", "").strip()
+        meaning = request.form.get("meaning", "").strip()
+        example = request.form.get("example", "").strip()
+        part_of_speech = request.form.get("part_of_speech", "").strip()
+        
+        if not word or not region or not meaning:
+            flash("Word, region, and meaning are required", "error")
+        elif region not in REGION_NAMES:
+            flash("Invalid region", "error")
+        else:
+            new_word = SlangWord(
+                word=word,
+                region=region,
+                meaning=meaning,
+                example=example,
+                part_of_speech=part_of_speech,
+                user_id=session["user_id"],
+                is_system=False
+            )
+            db.session.add(new_word)
+            db.session.commit()
+            flash("Word added successfully!", "success")
+            return redirect(url_for("slang_dictionary"))
+    
+    return render_template(
+        "add_slang_word.html",
+        nav=NAV,
+        regions=REGION_NAMES,
+        title="Add Slang Word"
+    )
+
+@app.route("/slang-dictionary/edit/<int:word_id>", methods=["GET", "POST"])
+@login_required_custom
+def edit_slang_word(word_id):
+    """Редактирование слова в словаре"""
+    word = SlangWord.query.get_or_404(word_id)
+    
+    if word.is_system:
+        flash("System words cannot be edited", "error")
+        return redirect(url_for("slang_dictionary"))
+    
+    if word.user_id != session["user_id"]:
+        flash("You can only edit your own words", "error")
+        return redirect(url_for("slang_dictionary"))
+    
+    if request.method == "POST":
+        word.word = request.form.get("word", "").strip()
+        word.region = request.form.get("region", "").strip()
+        word.meaning = request.form.get("meaning", "").strip()
+        word.example = request.form.get("example", "").strip()
+        word.part_of_speech = request.form.get("part_of_speech", "").strip()
+        
+        if not word.word or not word.region or not word.meaning:
+            flash("Word, region, and meaning are required", "error")
+        else:
+            db.session.commit()
+            flash("Word updated successfully!", "success")
+            return redirect(url_for("slang_dictionary"))
+    
+    return render_template(
+        "edit_slang_word.html",
+        nav=NAV,
+        word=word,
+        regions=REGION_NAMES,
+        title="Edit Slang Word"
+    )
+
+@app.route("/slang-dictionary/delete/<int:word_id>", methods=["POST"])
+@login_required_custom
+def delete_slang_word(word_id):
+    """Удаление слова из словаря"""
+    word = SlangWord.query.get_or_404(word_id)
+    
+    if word.is_system:
+        flash("System words cannot be deleted", "error")
+        return redirect(url_for("slang_dictionary"))
+    
+    if word.user_id != session["user_id"]:
+        flash("You can only delete your own words", "error")
+        return redirect(url_for("slang_dictionary"))
+    
+    db.session.delete(word)
+    db.session.commit()
+    flash("Word deleted successfully!", "success")
+    return redirect(url_for("slang_dictionary"))
 
 if __name__ == "__main__":
     app.run(debug=True)

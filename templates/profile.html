@@ -6,19 +6,30 @@
 
     <!-- SIDEBAR -->
     <aside class="profile-sidebar">
-      <div class="avatar"></div>
+      <div class="avatar-container">
+        {% if user.avatar_filename %}
+          <img src="{{ url_for('uploaded_avatar', filename=user.avatar_filename) }}" alt="Avatar" class="avatar-img" id="avatarPreview">
+        {% else %}
+          <div class="avatar" id="avatarPreview"></div>
+        {% endif %}
+        <label for="avatar-input" class="avatar-upload-label">
+          <span class="avatar-upload-icon">📷</span>
+          <span class="avatar-upload-text">Change Photo</span>
+        </label>
+        <input type="file" id="avatar-input" name="avatar" accept="image/*" style="display: none;" onchange="previewAvatar(this)" form="profile-form">
+      </div>
 
       <h2>{{ user.username }}</h2>
       <p class="profile-subtitle">English learner</p>
 
-      <form method="post" id="profile-form">
+      <form method="post" id="profile-form" enctype="multipart/form-data">
         <label>Email</label>
         <input type="email" name="email" value="{{ user.email or '' }}">
 
         <label>Last name</label>
         <input type="text" name="last_name" value="{{ user.last_name or '' }}">
 
-        <button class="save-btn">Save profile</button>
+        <button class="save-btn" type="submit">Save profile</button>
       </form>
     </aside>
 
@@ -40,4 +51,32 @@
 
   </div>
 </div>
+
+<script>
+  function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const preview = document.getElementById('avatarPreview');
+        if (preview.tagName === 'IMG') {
+          preview.src = e.target.result;
+        } else {
+          // Если это div, заменяем его на img
+          const img = document.createElement('img');
+          img.id = 'avatarPreview';
+          img.className = 'avatar-img';
+          img.src = e.target.result;
+          img.alt = 'Avatar';
+          preview.parentNode.replaceChild(img, preview);
+        }
+      };
+      
+      reader.readAsDataURL(input.files[0]);
+      
+      // Автоматически отправляем форму при выборе файла
+      document.getElementById('profile-form').submit();
+    }
+  }
+</script>
 {% endblock %}
