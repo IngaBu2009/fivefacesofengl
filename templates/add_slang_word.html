@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="add-word-page">
+  <div class="add-word-header">
+    <h1>Add New Slang Word</h1>
+    <p class="add-word-subtitle">Contribute to our slang dictionary by adding a new word!</p>
+  </div>
+
+  <div class="add-word-form-card">
+    <form method="POST" action="{{ url_for('add_slang_word') }}">
+      <div class="input-group">
+        <label for="word">Word or Phrase *</label>
+        <input type="text" id="word" name="word" required placeholder="e.g., What's up?">
+      </div>
+
+      <div class="input-group">
+        <label for="region">Region *</label>
+        <select id="region" name="region" required>
+          <option value="">Select a region...</option>
+          {% for key, name in regions.items() %}
+            <option value="{{ key }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="meaning">Meaning *</label>
+        <textarea id="meaning" name="meaning" required rows="3" placeholder="Explain what this word means..."></textarea>
+      </div>
+
+      <div class="input-group">
+        <label for="example">Example Sentence (optional)</label>
+        <textarea id="example" name="example" rows="2" placeholder='e.g., "Hey, what's up? How are you doing?"'></textarea>
+      </div>
+
+      <div class="input-group">
+        <label for="part_of_speech">Part of Speech (optional)</label>
+        <select id="part_of_speech" name="part_of_speech">
+          <option value="">Select...</option>
+          <option value="noun">Noun</option>
+          <option value="verb">Verb</option>
+          <option value="adjective">Adjective</option>
+          <option value="adverb">Adverb</option>
+          <option value="interjection">Interjection</option>
+          <option value="phrase">Phrase</option>
+          <option value="expression">Expression</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="auth-btn">Add Word</button>
+        <a href="{{ url_for('slang_dictionary') }}" class="cancel-btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

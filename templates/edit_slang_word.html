@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="add-word-page">
+  <div class="add-word-header">
+    <h1>Edit Slang Word</h1>
+    <p class="add-word-subtitle">Update the word information</p>
+  </div>
+
+  <div class="add-word-form-card">
+    <form method="POST" action="{{ url_for('edit_slang_word', word_id=word.id) }}">
+      <div class="input-group">
+        <label for="word">Word or Phrase *</label>
+        <input type="text" id="word" name="word" required value="{{ word.word }}">
+      </div>
+
+      <div class="input-group">
+        <label for="region">Region *</label>
+        <select id="region" name="region" required>
+          {% for key, name in regions.items() %}
+            <option value="{{ key }}" {% if word.region == key %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="meaning">Meaning *</label>
+        <textarea id="meaning" name="meaning" required rows="3">{{ word.meaning }}</textarea>
+      </div>
+
+      <div class="input-group">
+        <label for="example">Example Sentence (optional)</label>
+        <textarea id="example" name="example" rows="2">{{ word.example or '' }}</textarea>
+      </div>
+
+      <div class="input-group">
+        <label for="part_of_speech">Part of Speech (optional)</label>
+        <select id="part_of_speech" name="part_of_speech">
+          <option value="">Select...</option>
+          <option value="noun" {% if word.part_of_speech == 'noun' %}selected{% endif %}>Noun</option>
+          <option value="verb" {% if word.part_of_speech == 'verb' %}selected{% endif %}>Verb</option>
+          <option value="adjective" {% if word.part_of_speech == 'adjective' %}selected{% endif %}>Adjective</option>
+          <option value="adverb" {% if word.part_of_speech == 'adverb' %}selected{% endif %}>Adverb</option>
+          <option value="interjection" {% if word.part_of_speech == 'interjection' %}selected{% endif %}>Interjection</option>
+          <option value="phrase" {% if word.part_of_speech == 'phrase' %}selected{% endif %}>Phrase</option>
+          <option value="expression" {% if word.part_of_speech == 'expression' %}selected{% endif %}>Expression</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="auth-btn">Save Changes</button>
+        <a href="{{ url_for('slang_dictionary') }}" class="cancel-btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
