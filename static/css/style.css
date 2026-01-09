@@ -800,21 +800,6 @@ tr:first-child td {
   font-size: 13px;
 }
 
-.system-badge {
-  display: inline-block;
-  background: rgba(109, 140, 255, 0.2);
-  color: var(--accent);
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 12px;
-  margin-left: 12px;
-  font-weight: 500;
-  border: 1px solid var(--accent);
-}
-
-.system-fact {
-  border-left: 3px solid var(--accent);
-}
 
 .no-facts {
   text-align: center;
@@ -1388,9 +1373,6 @@ tr:first-child td {
   box-shadow: 0 20px 60px rgba(0,0,0,0.4);
 }
 
-.word-card.system-word {
-  border-left: 3px solid var(--accent);
-}
 
 .word-header {
   display: flex;

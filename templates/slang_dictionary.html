@@ -47,9 +47,7 @@
           <div class="word-header">
             <div class="word-title-section">
               <h2 class="word-title">{{ word_item.word }}</h2>
-              {% if word_item.is_system %}
-                <span class="system-badge">System</span>
-              {% endif %}
+
             </div>
             <div class="word-region">
               <span class="region-badge region-{{ word_item.region }}">{{ regions[word_item.region] }}</span>
