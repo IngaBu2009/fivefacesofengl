@@ -791,7 +791,9 @@ def delete_slang_word(word_id):
     return redirect(url_for("slang_dictionary"))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
